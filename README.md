@@ -10,6 +10,7 @@ It is an Instagram clone application developed using Jetpack compose, Hilt Dagge
 <li>Notifications Screen</li>
 <li>Like Post and Comments</li>
 <li>Follow / Unfollow a User</li>
+<li>Delete Post</li>
 </ul>
 <h2 tabindex="-1" dir="auto"><a class="anchor" aria-hidden="true" tabindex="-1" href="#technologies"></a>Technologies:</h2>
 <ul dir="auto">
