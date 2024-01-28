@@ -41,11 +41,12 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
+import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, encodedUri: String) {
+fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, encodedUri: String, isMyPostScreen: Boolean) {
     val imageUri by remember { mutableStateOf(encodedUri) }
     var description by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
@@ -63,7 +64,13 @@ fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, e
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "back",
-                modifier = Modifier.clickable { navController.popBackStack() }
+                modifier = Modifier.clickable {
+                    if (isMyPostScreen) {
+                        navController.navigate(DestinationScreen.Feed.route)
+                    } else {
+                        navController.popBackStack()
+                    }
+                }
             )
             Text(
                 text = "New post",
@@ -108,7 +115,7 @@ fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, e
             Button(
                 onClick = {
                     focusManager.clearFocus()
-                    viewModel.onNewPost(Uri.parse(imageUri), description) { navController.popBackStack() }
+                    viewModel.onNewPost(Uri.parse(imageUri), description) { navController.navigate(DestinationScreen.MyPosts.route) }
                 },
                 modifier = Modifier
                     .fillMaxWidth(),

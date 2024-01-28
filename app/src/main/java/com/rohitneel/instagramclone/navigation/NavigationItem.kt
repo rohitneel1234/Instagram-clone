@@ -7,8 +7,8 @@ sealed class DestinationScreen(val route:String){
     object Search: DestinationScreen("search")
     object MyPosts: DestinationScreen("post")
     object Profile: DestinationScreen("profile")
-    object NewPost: DestinationScreen("newpost/{imageUri}") {
-        fun createRoute(uri: String) = "newpost/$uri"
+    object NewPost: DestinationScreen("newpost/{imageUri}/{isMyPostScreen}") {
+        fun createRoute(uri: String, isMyPostScreen: Boolean) = "newpost/$uri/$isMyPostScreen"
     }
     object SinglePost: DestinationScreen("singlepost")
     object Comments: DestinationScreen("comments/{postId}") {

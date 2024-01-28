@@ -3,8 +3,10 @@ package com.rohitneel.instagramclone.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import com.rohitneel.instagramclone.auth.LoginScreen
 import com.rohitneel.instagramclone.auth.ProfileScreen
@@ -48,10 +50,20 @@ fun AppNavHost(
         composable(DestinationScreen.Profile.route) {
             ProfileScreen(navController = navController, viewModel = viewModel)
         }
-        composable(DestinationScreen.NewPost.route) { navBackStackEntry ->
+        composable(
+            DestinationScreen.NewPost.route,
+            arguments = listOf(
+                navArgument("imageUri") {
+                    type = NavType.StringType
+                },
+                navArgument("isMyPostScreen") {
+                    type = NavType.BoolType
+                }
+        )) { navBackStackEntry ->
             val imageUri = navBackStackEntry.arguments?.getString("imageUri")
+            val isMyPostScreen = navBackStackEntry.arguments?.getBoolean("isMyPostScreen") ?: false
             imageUri?.let {
-                NewPostScreen(navController = navController, viewModel = viewModel, encodedUri = it)
+                NewPostScreen(navController = navController, viewModel = viewModel, encodedUri = it, isMyPostScreen = isMyPostScreen)
             }
         }
         composable(DestinationScreen.SinglePost.route) {
@@ -72,7 +84,7 @@ fun AppNavHost(
             postId?.let { CommentsScreen(viewModel = viewModel, postId = it) }
         }
         composable(DestinationScreen.AddPostButton.route) {
-            CreatePostMenu(navController = navController, viewModel = viewModel)
+            CreatePostMenu(navController = navController)
         }
         composable(DestinationScreen.Notifications.route) {
             NotificationsScreen(navController = navController, viewModel = viewModel)

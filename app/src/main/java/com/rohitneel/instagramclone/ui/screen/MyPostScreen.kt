@@ -54,7 +54,7 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
     ) { uri ->
         uri?.let {
             val encoded = Uri.encode(it.toString())
-            val route = DestinationScreen.NewPost.createRoute(encoded)
+            val route = DestinationScreen.NewPost.createRoute(encoded, false)
             navController.navigate(route)
         }
     }
