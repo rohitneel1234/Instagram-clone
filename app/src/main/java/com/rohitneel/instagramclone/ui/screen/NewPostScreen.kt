@@ -46,7 +46,12 @@ import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, encodedUri: String, isMyPostScreen: Boolean) {
+fun NewPostScreen(
+    navController: NavController,
+    viewModel: InstagramViewModel,
+    encodedUri: String,
+    isMyPostScreen: Boolean
+) {
     val imageUri by remember { mutableStateOf(encodedUri) }
     var description by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
@@ -91,11 +96,11 @@ fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, e
         Row(modifier = Modifier.padding(16.dp)) {
             TextField(
                 value = description,
-                onValueChange = {description = it},
+                onValueChange = { description = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
-                placeholder = { Text(text = "Write a caption...")},
+                placeholder = { Text(text = "Write a caption...") },
                 singleLine = false,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -115,7 +120,11 @@ fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, e
             Button(
                 onClick = {
                     focusManager.clearFocus()
-                    viewModel.onNewPost(Uri.parse(imageUri), description) { navController.navigate(DestinationScreen.MyPosts.route) }
+                    viewModel.onNewPost(Uri.parse(imageUri), description) {
+                        navController.navigate(
+                            DestinationScreen.MyPosts.route
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -124,7 +133,7 @@ fun NewPostScreen(navController: NavController, viewModel: InstagramViewModel, e
                     containerColor = colorResource(id = R.color.blue),
                     contentColor = colorResource(id = R.color.white),
                     disabledContainerColor = colorResource(id = R.color.blue),
-                    disabledContentColor =  colorResource(id = R.color.blue)
+                    disabledContentColor = colorResource(id = R.color.blue)
                 )
             ) {
                 Text(

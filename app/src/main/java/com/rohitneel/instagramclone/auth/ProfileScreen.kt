@@ -56,7 +56,7 @@ import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 @Composable
 fun ProfileScreen(navController: NavController, viewModel: InstagramViewModel) {
     val isLoading = viewModel.inProgress.value
-    if(isLoading) {
+    if (isLoading) {
         CommonProgressSpinner()
     } else {
         val userData = viewModel.userData.value
@@ -72,7 +72,7 @@ fun ProfileScreen(navController: NavController, viewModel: InstagramViewModel) {
             onNameChange = { name = it },
             onUserNameChange = { userName = it },
             onBioChange = { bio = it },
-            onSave = { viewModel.updateProfileData(name, userName, bio)},
+            onSave = { viewModel.updateProfileData(name, userName, bio) },
             onBack = { navigateTo(navController = navController, DestinationScreen.MyPosts) },
             onLogout = {
                 viewModel.onLogout()
@@ -147,7 +147,8 @@ fun ProfileContent(
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
-            TextField(value = userName,
+            TextField(
+                value = userName,
                 onValueChange = onUserNameChange,
                 label = { Text(text = "Username") },
                 colors = TextFieldDefaults.colors(
@@ -195,7 +196,7 @@ fun ProfileContent(
 
 @Composable
 fun ProfileImage(imageUrl: String?, viewModel: InstagramViewModel) {
-    val launcher =  rememberLauncherForActivityResult(
+    val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { viewModel.uploadProfileImage(uri) }
@@ -213,7 +214,7 @@ fun ProfileImage(imageUrl: String?, viewModel: InstagramViewModel) {
                 modifier = Modifier
                     .padding(8.dp)
                     .size(100.dp)
-                ) {
+            ) {
                 CommonImage(data = imageUrl)
             }
             Text(

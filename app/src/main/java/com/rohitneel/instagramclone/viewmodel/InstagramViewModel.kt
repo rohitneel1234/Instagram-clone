@@ -29,7 +29,7 @@ class InstagramViewModel @Inject constructor(
     val auth: FirebaseAuth,
     val database: FirebaseFirestore,
     val storage: FirebaseStorage
-): ViewModel() {
+) : ViewModel() {
 
     val signedIn = mutableStateOf(false)
     val inProgress = mutableStateOf(false)
@@ -46,11 +46,11 @@ class InstagramViewModel @Inject constructor(
     val comments = mutableStateOf<List<CommentData>>(listOf())
     val commentsProgress = mutableStateOf(false)
 
-    val followers =  mutableStateOf(0)
+    val followers = mutableStateOf(0)
 
     init {
-        val currentUser =  auth.currentUser
-        signedIn.value = currentUser!= null
+        val currentUser = auth.currentUser
+        signedIn.value = currentUser != null
         currentUser?.uid?.let { userId ->
             getUserData(userId)
         }
@@ -114,12 +114,12 @@ class InstagramViewModel @Inject constructor(
         imageUrl: String? = null
     ) {
         val userId = auth.currentUser?.uid
-        val userData =  UserData(
+        val userData = UserData(
             userId = userId,
             name = name ?: userData.value?.name,
             userName = userName ?: userData.value?.userName,
-            bio =  bio ?: userData.value?.bio,
-            imageUrl = imageUrl ?:userData.value?.imageUrl,
+            bio = bio ?: userData.value?.bio,
+            imageUrl = imageUrl ?: userData.value?.imageUrl,
             following = userData.value?.following
         )
         userId?.let { userId ->
@@ -160,7 +160,7 @@ class InstagramViewModel @Inject constructor(
                 getPersonalizedFeed()
                 getFollowers(user?.userId)
             }
-            .addOnFailureListener {exception->
+            .addOnFailureListener { exception ->
                 handleException(exception, "Cannot retrieve user model")
                 inProgress.value = false
             }
@@ -168,8 +168,8 @@ class InstagramViewModel @Inject constructor(
 
     private fun handleException(exception: Exception? = null, customMessage: String = "") {
         exception?.printStackTrace()
-        val errorMessage = exception?.localizedMessage?: ""
-        val message = if(customMessage.isEmpty()) errorMessage else "$customMessage: $errorMessage"
+        val errorMessage = exception?.localizedMessage ?: ""
+        val message = if (customMessage.isEmpty()) errorMessage else "$customMessage: $errorMessage"
         popupNotification.value = Event(message)
     }
 
@@ -186,7 +186,7 @@ class InstagramViewModel @Inject constructor(
         uploadTask
             .addOnSuccessListener {
                 val result = it.metadata?.reference?.downloadUrl
-                result?.addOnSuccessListener (onSuccess)
+                result?.addOnSuccessListener(onSuccess)
             }
             .addOnFailureListener { exe ->
                 handleException(exe)
@@ -209,13 +209,13 @@ class InstagramViewModel @Inject constructor(
                 convertPosts(it, posts)
                 val refs = arrayListOf<DocumentReference>()
                 for (post in posts.value) {
-                    post.postId?.let { id->
+                    post.postId?.let { id ->
                         refs.add(database.collection(POSTS).document(id))
                     }
                 }
-                if(refs.isNotEmpty()) {
+                if (refs.isNotEmpty()) {
                     database.runBatch { batch ->
-                        for(ref in refs) {
+                        for (ref in refs) {
                             batch.update(ref, "userImage", imageUrl)
                         }
                     }
@@ -248,8 +248,8 @@ class InstagramViewModel @Inject constructor(
         val currentUsername = userData.value?.userName
         val currentUserImage = userData.value?.imageUrl
 
-        if(currentUid != null) {
-            val postUuid =  UUID.randomUUID().toString()
+        if (currentUid != null) {
+            val postUuid = UUID.randomUUID().toString()
 
             val fillerWords = listOf("the", "be", "to", "is", "of", "and", "or", "a", "in", "it")
             val searchTerms = description.split(" ", ".", ",", "?", "!", "#")
@@ -259,11 +259,11 @@ class InstagramViewModel @Inject constructor(
                 postId = postUuid,
                 userId = currentUid,
                 userName = currentUsername,
-                userImage =  currentUserImage,
+                userImage = currentUserImage,
                 postImage = imageUri.toString(),
                 postDescription = description,
                 time = System.currentTimeMillis(),
-                likes = listOf<String>(),
+                likes = listOf(),
                 searchTerms = searchTerms
             )
             database.collection(POSTS).document(postUuid).set(post)
@@ -304,7 +304,7 @@ class InstagramViewModel @Inject constructor(
     }
 
     private fun convertPosts(documents: QuerySnapshot, outState: MutableState<List<PostData>>) {
-        val newPosts =  mutableListOf<PostData>()
+        val newPosts = mutableListOf<PostData>()
         documents.forEach { doc ->
             val post = doc.toObject<PostData>()
             newPosts.add(post)
@@ -323,7 +323,7 @@ class InstagramViewModel @Inject constructor(
                     convertPosts(it, searchedPost)
                     searchedPostProgress.value = false
                 }
-                .addOnFailureListener {exc ->
+                .addOnFailureListener { exc ->
                     handleException(exc, "Cannot search posts")
                     searchedPostProgress.value = false
                 }
@@ -412,12 +412,12 @@ class InstagramViewModel @Inject constructor(
 
     fun createComment(postId: String, text: String) {
         userData.value?.userName?.let { username ->
-            val commentId =  UUID.randomUUID().toString()
-            val comment =  CommentData(
+            val commentId = UUID.randomUUID().toString()
+            val comment = CommentData(
                 commentId = commentId,
                 postId = postId,
                 userName = username,
-                text =  text,
+                text = text,
                 timeStamp = System.currentTimeMillis()
             )
             database.collection(COMMENTS).document(commentId).set(comment)

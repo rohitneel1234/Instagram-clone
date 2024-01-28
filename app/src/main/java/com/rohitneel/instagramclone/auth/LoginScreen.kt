@@ -41,7 +41,7 @@ fun LoginScreen(navController: NavController, viewModel: InstagramViewModel) {
 
     val focus = LocalFocusManager.current
 
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,13 +70,13 @@ fun LoginScreen(navController: NavController, viewModel: InstagramViewModel) {
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
                 modifier = Modifier.padding(8.dp),
-                label = { Text(text = "Email")}
+                label = { Text(text = "Email") }
             )
             OutlinedTextField(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
                 modifier = Modifier.padding(8.dp),
-                label = { Text(text = "Password")},
+                label = { Text(text = "Password") },
                 visualTransformation = PasswordVisualTransformation()
             )
             Button(

@@ -99,27 +99,27 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
                 actionIconContentColor = Color.Black
             ),
             actions = {
-            Row {
-                IconButton(onClick = {
-                    //navController.navigate(NavigationItem.Notification.route)
-                }) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_notifications),
-                        contentDescription = null,
-                        Modifier.padding(8.dp)
-                    )
+                Row {
+                    IconButton(onClick = {
+                        //navController.navigate(NavigationItem.Notification.route)
+                    }) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_notifications),
+                            contentDescription = null,
+                            Modifier.padding(8.dp)
+                        )
+                    }
+                    IconButton(onClick = {
+                        //navController.navigate(NavigationItem.ChatList.route)
+                    }) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_message),
+                            contentDescription = null,
+                            Modifier.padding(8.dp)
+                        )
+                    }
                 }
-                IconButton(onClick = {
-                    //navController.navigate(NavigationItem.ChatList.route)
-                }) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_message),
-                        contentDescription = null,
-                        Modifier.padding(8.dp)
-                    )
-                }
-            }
-        })
+            })
 
         Row(
             modifier = Modifier
@@ -152,7 +152,9 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
                     text = "Your story",
                     fontSize = 10.sp,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.width(60.dp).padding(start = 10.dp),
+                    modifier = Modifier
+                        .width(60.dp)
+                        .padding(start = 10.dp),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1
                 )
@@ -173,7 +175,7 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
 @Composable
 fun StoriesSection(storyList: List<Stories>) {
     LazyRow {
-        items(storyList) {story ->
+        items(storyList) { story ->
             StoryItem(story = story)
         }
     }
@@ -252,9 +254,14 @@ fun PostsList(
 }
 
 @Composable
-fun Post(post: PostData, currentUserId: String, viewModel: InstagramViewModel, onPostClick: () -> Unit) {
-    val likeAnimation =  remember { mutableStateOf(false) }
-    val dislikeAnimation =  remember { mutableStateOf(false) }
+fun Post(
+    post: PostData,
+    currentUserId: String,
+    viewModel: InstagramViewModel,
+    onPostClick: () -> Unit
+) {
+    val likeAnimation = remember { mutableStateOf(false) }
+    val dislikeAnimation = remember { mutableStateOf(false) }
 
     Card(
         shape = RoundedCornerShape(corner = CornerSize(4.dp)),
@@ -271,13 +278,18 @@ fun Post(post: PostData, currentUserId: String, viewModel: InstagramViewModel, o
                     .background(Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Card(shape = CircleShape, modifier = Modifier
-                    .padding(4.dp)
-                    .size(32.dp)
+                Card(
+                    shape = CircleShape, modifier = Modifier
+                        .padding(4.dp)
+                        .size(32.dp)
                 ) {
                     CommonImage(data = post.userImage, contentScale = ContentScale.Crop)
                 }
-                Text(text = post.userName ?: "", fontWeight = FontWeight.Bold, modifier = Modifier.padding(4.dp))
+                Text(
+                    text = post.userName ?: "",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(4.dp)
+                )
             }
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 val modifier = Modifier

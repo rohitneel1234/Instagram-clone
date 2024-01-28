@@ -147,7 +147,7 @@ fun CommonDivider() {
     )
 }
 
-private enum class LikeIconSize() {
+private enum class LikeIconSize {
     SMALL,
     LARGE
 }

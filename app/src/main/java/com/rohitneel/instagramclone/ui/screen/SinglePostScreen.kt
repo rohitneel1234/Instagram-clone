@@ -80,8 +80,8 @@ import com.rohitneel.instagramclone.ui.components.ToggleIconButton
 
 @Composable
 fun SinglePostScreen(navController: NavController, viewModel: InstagramViewModel, post: PostData) {
-   val comments = viewModel.comments.value
-    
+    val comments = viewModel.comments.value
+
     LaunchedEffect(key1 = Unit) {
         viewModel.getComments(post.postId)
     }
@@ -124,7 +124,12 @@ fun SinglePostScreen(navController: NavController, viewModel: InstagramViewModel
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun SinglePostDisplay(navController: NavController, viewModel: InstagramViewModel, post: PostData, numberOfComments: Int) {
+fun SinglePostDisplay(
+    navController: NavController,
+    viewModel: InstagramViewModel,
+    post: PostData,
+    numberOfComments: Int
+) {
     val userData = viewModel.userData.value
     val isBottomSheetOpened = remember { mutableStateOf(false) }
     val isCommentBottomSheetOpened = remember { mutableStateOf(false) }
@@ -221,8 +226,7 @@ fun SinglePostDisplay(navController: NavController, viewModel: InstagramViewMode
                 if (it) {
                     post.likes
                     viewModel.onLikePost(post)
-                }
-                else {
+                } else {
                     post.likes
                 }
                 isFavorite = !isFavorite
@@ -292,7 +296,11 @@ fun SinglePostDisplay(navController: NavController, viewModel: InstagramViewMode
 
     if (isCommentBottomSheetOpened.value) {
         post.postId?.let {
-            ShowCommentScreen(isCommentBottomSheetOpened = isCommentBottomSheetOpened, viewModel = viewModel, postId = it)
+            ShowCommentScreen(
+                isCommentBottomSheetOpened = isCommentBottomSheetOpened,
+                viewModel = viewModel,
+                postId = it
+            )
         }
     }
 

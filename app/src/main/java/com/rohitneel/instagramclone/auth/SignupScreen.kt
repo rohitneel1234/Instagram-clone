@@ -76,19 +76,19 @@ fun SignupScreen(navController: NavController, viewModel: InstagramViewModel) {
                 value = userNameState.value,
                 onValueChange = { userNameState.value = it },
                 modifier = Modifier.padding(8.dp),
-                label = { Text(text = "Username")}
+                label = { Text(text = "Username") }
             )
             OutlinedTextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
                 modifier = Modifier.padding(8.dp),
-                label = { Text(text = "Email")}
+                label = { Text(text = "Email") }
             )
             OutlinedTextField(
                 value = passState.value,
                 onValueChange = { passState.value = it },
                 modifier = Modifier.padding(8.dp),
-                label = { Text(text = "Password")},
+                label = { Text(text = "Password") },
                 visualTransformation = PasswordVisualTransformation()
             )
             Button(
@@ -125,6 +125,10 @@ fun SignupScreen(navController: NavController, viewModel: InstagramViewModel) {
 @Composable
 fun SignupScreenPreview() {
     val navController = rememberNavController()
-    val viewModel = InstagramViewModel(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(), FirebaseStorage.getInstance())
+    val viewModel = InstagramViewModel(
+        FirebaseAuth.getInstance(),
+        FirebaseFirestore.getInstance(),
+        FirebaseStorage.getInstance()
+    )
     SignupScreen(navController, viewModel)
 }

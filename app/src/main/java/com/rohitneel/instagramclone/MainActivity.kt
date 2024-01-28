@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun InstagramApp() {
     val viewModel = hiltViewModel<InstagramViewModel>()
-    val navController =  rememberNavController()
+    val navController = rememberNavController()
     var showBottomBar by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -73,7 +73,11 @@ fun InstagramApp() {
         },
         containerColor = Color.White,
     ) {
-        AppNavHost(navController = navController, viewModel = viewModel, modifier = Modifier.padding(it))
+        AppNavHost(
+            navController = navController,
+            viewModel = viewModel,
+            modifier = Modifier.padding(it)
+        )
     }
 }
 
@@ -81,6 +85,6 @@ fun InstagramApp() {
 @Composable
 fun InstagramAppPreview() {
     InstagramCloneTheme {
-       InstagramApp()
+        InstagramApp()
     }
 }

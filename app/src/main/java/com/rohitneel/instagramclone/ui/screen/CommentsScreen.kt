@@ -37,7 +37,7 @@ fun CommentsScreen(viewModel: InstagramViewModel, postId: String) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        if(commentsProgress) {
+        if (commentsProgress) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -45,7 +45,7 @@ fun CommentsScreen(viewModel: InstagramViewModel, postId: String) {
             ) {
                 CommonProgressSpinner()
             }
-        } else if(comments.isEmpty()) {
+        } else if (comments.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,15 +55,16 @@ fun CommentsScreen(viewModel: InstagramViewModel, postId: String) {
             }
         } else {
             LazyColumn(modifier = Modifier.weight(1f)) {
-                items(items =  comments) { comment ->
+                items(items = comments) { comment ->
                     CommentRow(comment)
                 }
             }
         }
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
             TextField(
                 value = commentText,
@@ -96,9 +97,11 @@ fun CommentsScreen(viewModel: InstagramViewModel, postId: String) {
 
 @Composable
 fun CommentRow(comment: CommentData) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
         Text(text = comment.userName ?: "", fontWeight = FontWeight.Bold)
         Text(text = comment.text ?: "", modifier = Modifier.padding(start = 8.dp))
     }
