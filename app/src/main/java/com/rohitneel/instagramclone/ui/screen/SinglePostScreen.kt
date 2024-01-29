@@ -377,7 +377,11 @@ fun ShowCommentScreen(
                         placeholder = { Text("Add a comment...") },
                         trailingIcon = {
                             IconButton(
-                                onClick = { }
+                                onClick = {
+                                    viewModel.createComment(postId = postId, text = commentText)
+                                    commentText = ""
+                                    focusManager.clearFocus()
+                                }
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_comment_send),

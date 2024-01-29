@@ -35,7 +35,7 @@ fun AppNavHost(
         startDestination = DestinationScreen.Signup.route
     ) {
         composable(DestinationScreen.Signup.route){
-            SignupScreen(navController, viewModel)
+            SignupScreen(navController = navController, viewModel = viewModel)
         }
         composable(DestinationScreen.Login.route) {
             LoginScreen(navController = navController, viewModel = viewModel)
@@ -96,7 +96,7 @@ fun AppNavHost(
         }
         composable(DestinationScreen.ViewStory.route) {
             val listOfImage = listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
-            ViewStory(listOfImage, navController)
+            ViewStory(navController = navController, listOfImage = listOfImage, )
         }
     }
 

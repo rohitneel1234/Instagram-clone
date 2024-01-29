@@ -84,9 +84,9 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
     ) {
         TopAppBar(title = {
             Image(
-                painter = painterResource(id = R.drawable.ic_instagram_title_logo),
+                painter = painterResource(id = R.drawable.ic_instagram_title),
                 contentDescription = null,
-                Modifier.padding(8.dp)
+                Modifier.padding(vertical = 8.dp)
             )
         },
             colors = TopAppBarColors(

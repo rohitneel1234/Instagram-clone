@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ViewStory(listOfImage: List<Int>, navController: NavController) {
+fun ViewStory(navController: NavController, listOfImage: List<Int>) {
     val pagerState = rememberPagerState(pageCount = { listOfImage.size })
     val coroutineScope = rememberCoroutineScope()
     var currentPage by remember { mutableStateOf(0) }
