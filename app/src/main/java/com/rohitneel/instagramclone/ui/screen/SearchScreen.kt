@@ -20,9 +20,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.NavParams
 import com.rohitneel.instagramclone.common.navigateTo
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
@@ -64,7 +66,7 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
                 Text(
                     text = "Search name",
                     fontSize = 16.sp,
-                    color = Color.Gray
+                    color = colorResource(id = R.color.light_gray_color)
                 )
             },
             onSearch = {

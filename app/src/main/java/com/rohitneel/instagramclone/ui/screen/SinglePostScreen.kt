@@ -240,9 +240,10 @@ fun SinglePostDisplay(
                 }
             ) {
                 Icon(
-                    painterResource(id = R.drawable.ic_comment),
+                    painter = painterResource(id = R.drawable.ic_comment),
                     contentDescription = null,
-                    Modifier.padding(vertical = 8.dp)
+                    tint = Color.Black,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
             IconButton(
@@ -251,6 +252,7 @@ fun SinglePostDisplay(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_share),
                     contentDescription = null,
+                    tint = Color.Black,
                     modifier = Modifier
                         .padding(vertical = 8.dp)
                         .size(28.dp)

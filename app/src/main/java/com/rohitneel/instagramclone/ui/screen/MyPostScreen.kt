@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -24,14 +25,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -59,6 +67,7 @@ import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.ui.theme.LIGHT_BLUE
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
     val newPostImageLauncher = rememberLauncherForActivityResult(
@@ -77,7 +86,41 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
     val posts = viewModel.posts.value
     val followers = viewModel.followers.value
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    Column {
+    val userNameDisplay = if (userData?.userName == null) "" else "${userData.userName}"
+    Column(modifier = Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = {
+                Row(modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_lock),
+                        contentDescription = null,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = userNameDisplay,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            },
+            colors = TopAppBarColors(
+                containerColor = Color.White,
+                scrolledContainerColor = Color.White,
+                navigationIconContentColor = Color.White,
+                titleContentColor = Color.Black,
+                actionIconContentColor = Color.Black
+            ),
+            actions = {
+                IconButton(onClick = { }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_menu),
+                        contentDescription = "menu",
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+        )
         Column(modifier = Modifier.weight(1f)) {
             Row {
                 ProfileImage(userData?.imageUrl) {
@@ -106,10 +149,7 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
                 )
             }
             Column(modifier = Modifier.padding(8.dp)) {
-                val userNameDisplay =
-                    if (userData?.userName == null) "" else "@${userData.userName}"
                 Text(text = userData?.name ?: "", fontWeight = FontWeight.Bold)
-                Text(text = userNameDisplay)
                 Text(text = userData?.bio ?: "")
             }
             OutlinedButton(
