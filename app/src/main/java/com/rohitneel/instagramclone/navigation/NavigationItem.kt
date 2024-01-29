@@ -17,4 +17,5 @@ sealed class DestinationScreen(val route:String){
     object AddPostButton: DestinationScreen("addpost")
 
     object Notifications: DestinationScreen("notifications")
+    object ViewStory: DestinationScreen("viewstory")
 }

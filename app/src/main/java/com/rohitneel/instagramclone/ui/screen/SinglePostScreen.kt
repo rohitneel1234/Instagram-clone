@@ -365,40 +365,41 @@ fun ShowCommentScreen(
                         }
                     }
                 }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                TextField(
-                    value = commentText,
-                    onValueChange = { commentText = it },
-                    placeholder = { Text("Add a comment...") },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_comment_send),
-                                tint = Color.Blue,
-                                contentDescription = null,
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                        }
-                    ),
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                )
+                        .padding(8.dp)
+                ) {
+                    TextField(
+                        value = commentText,
+                        onValueChange = { commentText = it },
+                        placeholder = { Text("Add a comment...") },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_comment_send),
+                                    tint = Color.Blue,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                            }
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                }
             }
         }
     }

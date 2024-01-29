@@ -188,7 +188,10 @@ fun ProfileContent(
     }
     if (showDialog) {
         LogoutConfirmationDialog(
-            onLogout = { onLogout.invoke() },
+            onLogout = {
+                showDialog = false
+                onLogout.invoke()
+            },
             onDismiss = { showDialog = false }
         )
     }
@@ -246,7 +249,7 @@ private fun LogoutConfirmationDialog(onLogout: () -> Unit, onDismiss: () -> Unit
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Log out from account?",
+                    text = "Log out of your account?",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     modifier = Modifier.padding(8.dp)
@@ -258,7 +261,7 @@ private fun LogoutConfirmationDialog(onLogout: () -> Unit, onDismiss: () -> Unit
                     Text(
                         text = "Log out",
                         fontSize = 16.sp,
-                        color = colorResource(id = R.color.blue),
+                        color = Color.Red,
                         fontWeight = FontWeight.Bold
                     )
                 }

@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import com.rohitneel.instagramclone.auth.LoginScreen
 import com.rohitneel.instagramclone.auth.ProfileScreen
@@ -20,6 +21,7 @@ import com.rohitneel.instagramclone.ui.screen.NewPostScreen
 import com.rohitneel.instagramclone.ui.screen.NotificationsScreen
 import com.rohitneel.instagramclone.ui.screen.SearchScreen
 import com.rohitneel.instagramclone.ui.screen.SinglePostScreen
+import com.rohitneel.instagramclone.ui.screen.ViewStory
 
 @Composable
 fun AppNavHost(
@@ -87,7 +89,14 @@ fun AppNavHost(
             CreatePostMenu(navController = navController)
         }
         composable(DestinationScreen.Notifications.route) {
-            NotificationsScreen(navController = navController, viewModel = viewModel)
+            NotificationsScreen(
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
+        composable(DestinationScreen.ViewStory.route) {
+            val listOfImage = listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
+            ViewStory(listOfImage, navController)
         }
     }
 

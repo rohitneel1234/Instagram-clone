@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -27,12 +29,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CheckSignedIn
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
 import com.rohitneel.instagramclone.common.navigateTo
 import com.rohitneel.instagramclone.navigation.DestinationScreen
+import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: InstagramViewModel) {
@@ -84,13 +86,14 @@ fun LoginScreen(navController: NavController, viewModel: InstagramViewModel) {
                     focus.clearFocus(force = true)
                     viewModel.onLogin(emailState.value.text, passwordState.value.text)
                 },
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.button_color)),
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = "LOGIN")
+                Text(text = "Log in")
             }
             Text(
                 text = "New here? Go to Signup ->",
-                color = Color.Blue,
+                color = Color.Black,
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable { navigateTo(navController, DestinationScreen.Signup) }

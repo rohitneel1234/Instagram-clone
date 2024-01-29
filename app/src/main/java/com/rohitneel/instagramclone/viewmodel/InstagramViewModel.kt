@@ -15,7 +15,6 @@ import com.rohitneel.instagramclone.models.Event
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.models.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.lang.Exception
 import java.util.UUID
 import javax.inject.Inject
 
@@ -45,6 +44,8 @@ class InstagramViewModel @Inject constructor(
     val postFeedProgress = mutableStateOf(false)
     val comments = mutableStateOf<List<CommentData>>(listOf())
     val commentsProgress = mutableStateOf(false)
+    var likedPostList = mutableStateOf<List<PostData>>(listOf())
+    val likedPostProgress = mutableStateOf(false)
 
     val followers = mutableStateOf(0)
 
@@ -54,6 +55,7 @@ class InstagramViewModel @Inject constructor(
         currentUser?.uid?.let { userId ->
             getUserData(userId)
         }
+        getLikedPosts()
     }
 
     fun onSignup(userName: String, email: String, password: String) {
@@ -234,6 +236,7 @@ class InstagramViewModel @Inject constructor(
         searchedPost.value = listOf()
         postFeed.value = listOf()
         comments.value = listOf()
+        likedPostList.value = listOf()
     }
 
     fun onNewPost(uri: Uri, description: String, onPostSuccess: () -> Unit) {
@@ -401,6 +404,7 @@ class InstagramViewModel @Inject constructor(
                     database.collection(POSTS).document(postId).update("likes", newLikes)
                         .addOnSuccessListener {
                             postData.likes = newLikes
+                            getLikedPosts()
                         }
                         .addOnFailureListener {
                             handleException(it, "Unable to like post")
@@ -446,6 +450,20 @@ class InstagramViewModel @Inject constructor(
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot retrieve comments")
                 commentsProgress.value = false
+            }
+    }
+
+    private fun getLikedPosts() {
+        likedPostProgress.value = true
+        val currentUid = auth.currentUser?.uid
+        database.collection(POSTS).whereEqualTo("userId", currentUid).get()
+            .addOnSuccessListener { snapshot ->
+                convertPosts(snapshot, likedPostList)
+                likedPostProgress.value = false
+            }
+            .addOnFailureListener { exc ->
+                handleException(exc, "Cannot retrieve liked posts")
+                likedPostProgress.value = false
             }
     }
 

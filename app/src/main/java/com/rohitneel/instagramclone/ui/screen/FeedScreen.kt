@@ -25,7 +25,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -53,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
-import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
@@ -65,6 +62,7 @@ import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.models.Stories
 import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.ui.theme.LIGHT_BLUE
+import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -159,7 +157,7 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
                     maxLines = 1
                 )
             }
-            StoriesSection(storyList = getStories())
+            StoriesSection(storyList = getStories(), navController = navController)
         }
         PostsList(
             posts = personalizedFeed,
@@ -173,10 +171,10 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
 }
 
 @Composable
-fun StoriesSection(storyList: List<Stories>) {
+fun StoriesSection(storyList: List<Stories>, navController: NavController) {
     LazyRow {
         items(storyList) { story ->
-            StoryItem(story = story)
+            StoryItem(story = story, navController = navController)
         }
     }
 }
@@ -189,9 +187,10 @@ fun getStories(): List<Stories> = listOf(
 )
 
 @Composable
-fun StoryItem(story: Stories) {
-
-    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+fun StoryItem(story: Stories, navController: NavController) {
+    Column(modifier = Modifier
+        .padding(horizontal = 8.dp, vertical = 8.dp)
+        .width(60.dp)) {
         Image(
             painter = painterResource(id = story.profile),
             contentDescription = "story title",
@@ -208,7 +207,10 @@ fun StoryItem(story: Stories) {
                     shape = CircleShape
                 )
                 .padding(5.dp)
-                .clip(CircleShape),
+                .clip(CircleShape)
+                .clickable {
+                    navController.navigate(DestinationScreen.ViewStory.route)
+                },
             contentScale = ContentScale.Crop
         )
 
@@ -223,7 +225,6 @@ fun StoryItem(story: Stories) {
             maxLines = 1
         )
     }
-
 }
 
 @Composable
