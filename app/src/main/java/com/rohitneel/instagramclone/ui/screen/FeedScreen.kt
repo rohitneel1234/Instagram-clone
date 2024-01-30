@@ -180,10 +180,10 @@ fun StoriesSection(storyList: List<Stories>, navController: NavController) {
 }
 
 fun getStories(): List<Stories> = listOf(
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_app_logo),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_app_logo),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_app_logo),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_app_logo)
+    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
+    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
+    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
+    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo)
 )
 
 @Composable

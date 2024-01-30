@@ -25,6 +25,7 @@ import com.rohitneel.instagramclone.common.NotificationMessage
 import com.rohitneel.instagramclone.navigation.AppNavHost
 import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.ui.theme.InstagramCloneTheme
+import com.rohitneel.instagramclone.ui.theme.SetStatusBarColor
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             InstagramCloneTheme {
+                SetStatusBarColor(Color.White)
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

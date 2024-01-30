@@ -10,6 +10,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.storage.FirebaseStorage
+import com.rohitneel.instagramclone.core.Constants.Companion.COMMENTS_COLLECTION
+import com.rohitneel.instagramclone.core.Constants.Companion.POSTS_COLLECTION
+import com.rohitneel.instagramclone.core.Constants.Companion.USERS_COLLECTION
 import com.rohitneel.instagramclone.models.CommentData
 import com.rohitneel.instagramclone.models.Event
 import com.rohitneel.instagramclone.models.PostData
@@ -17,11 +20,6 @@ import com.rohitneel.instagramclone.models.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import javax.inject.Inject
-
-const val USERS = "users"
-const val POSTS = "posts"
-const val COMMENTS = "comments"
-
 
 @HiltViewModel
 class InstagramViewModel @Inject constructor(
@@ -64,7 +62,7 @@ class InstagramViewModel @Inject constructor(
             return
         }
         inProgress.value = true
-        database.collection(USERS).whereEqualTo("userName", userName).get()
+        database.collection(USERS_COLLECTION).whereEqualTo("userName", userName).get()
             .addOnSuccessListener { documents ->
                 if (documents.size() > 0) {
                     handleException(customMessage = "Username already exists")
@@ -126,7 +124,7 @@ class InstagramViewModel @Inject constructor(
         )
         userId?.let { userId ->
             inProgress.value = true
-            database.collection(USERS).document(userId).get()
+            database.collection(USERS_COLLECTION).document(userId).get()
                 .addOnSuccessListener {
                     if (it.exists()) {
                         it.reference.update(userData.toMap())
@@ -139,7 +137,7 @@ class InstagramViewModel @Inject constructor(
                                 inProgress.value = false
                             }
                     } else {
-                        database.collection(USERS).document(userId).set(userData)
+                        database.collection(USERS_COLLECTION).document(userId).set(userData)
                         getUserData(userId)
                         inProgress.value = false
                     }
@@ -153,7 +151,7 @@ class InstagramViewModel @Inject constructor(
 
     private fun getUserData(userId: String) {
         inProgress.value = true
-        database.collection(USERS).document(userId).get()
+        database.collection(USERS_COLLECTION).document(userId).get()
             .addOnSuccessListener {
                 val user = it.toObject<UserData>()
                 userData.value = user
@@ -205,14 +203,14 @@ class InstagramViewModel @Inject constructor(
 
     private fun updatePostUserImageData(imageUrl: String) {
         val currentUid = auth.currentUser?.uid
-        database.collection(POSTS).whereEqualTo("userId", currentUid).get()
+        database.collection(POSTS_COLLECTION).whereEqualTo("userId", currentUid).get()
             .addOnSuccessListener {
                 val posts = mutableStateOf<List<PostData>>(arrayListOf())
                 convertPosts(it, posts)
                 val refs = arrayListOf<DocumentReference>()
                 for (post in posts.value) {
                     post.postId?.let { id ->
-                        refs.add(database.collection(POSTS).document(id))
+                        refs.add(database.collection(POSTS_COLLECTION).document(id))
                     }
                 }
                 if (refs.isNotEmpty()) {
@@ -269,7 +267,7 @@ class InstagramViewModel @Inject constructor(
                 likes = listOf(),
                 searchTerms = searchTerms
             )
-            database.collection(POSTS).document(postUuid).set(post)
+            database.collection(POSTS_COLLECTION).document(postUuid).set(post)
                 .addOnSuccessListener {
                     popupNotification.value = Event("Post successfully created")
                     inProgress.value = false
@@ -291,7 +289,7 @@ class InstagramViewModel @Inject constructor(
         val currentUid = auth.currentUser?.uid
         if (currentUid != null) {
             refreshPostsProgress.value = true
-            database.collection(POSTS).whereEqualTo("userId", currentUid).get()
+            database.collection(POSTS_COLLECTION).whereEqualTo("userId", currentUid).get()
                 .addOnSuccessListener { documents ->
                     convertPosts(documents, posts)
                     refreshPostsProgress.value = false
@@ -319,7 +317,7 @@ class InstagramViewModel @Inject constructor(
     fun searchPosts(searchTerm: String) {
         if (searchTerm.isNotEmpty()) {
             searchedPostProgress.value = true
-            database.collection(POSTS)
+            database.collection(POSTS_COLLECTION)
                 .whereArrayContains("searchTerms", searchTerm.trim().lowercase())
                 .get()
                 .addOnSuccessListener {
@@ -344,7 +342,7 @@ class InstagramViewModel @Inject constructor(
             } else {
                 following.add(userId)
             }
-            database.collection(USERS).document(currentUser).update("following", following)
+            database.collection(USERS_COLLECTION).document(currentUser).update("following", following)
                 .addOnSuccessListener {
                     getUserData(currentUser)
                 }
@@ -355,7 +353,7 @@ class InstagramViewModel @Inject constructor(
     private fun getPersonalizedFeed() {
         val following = userData.value?.following
         if (!following.isNullOrEmpty()) {
-            database.collection(POSTS).whereEqualTo("userId", following).get()
+            database.collection(POSTS_COLLECTION).whereEqualTo("userId", following).get()
                 .addOnSuccessListener {
                     convertPosts(documents = it, outState = postFeed)
                     if (postFeed.value.isEmpty()) {
@@ -377,7 +375,7 @@ class InstagramViewModel @Inject constructor(
         postFeedProgress.value = true
         val currentTime = System.currentTimeMillis()
         val difference = 24 * 60 * 60 * 1000 // 1 day in millis
-        database.collection(POSTS)
+        database.collection(POSTS_COLLECTION)
             .whereGreaterThan("time", currentTime - difference)
             .get()
             .addOnSuccessListener {
@@ -401,7 +399,7 @@ class InstagramViewModel @Inject constructor(
                     newLikes.add(userId)
                 }
                 postData.postId?.let { postId ->
-                    database.collection(POSTS).document(postId).update("likes", newLikes)
+                    database.collection(POSTS_COLLECTION).document(postId).update("likes", newLikes)
                         .addOnSuccessListener {
                             postData.likes = newLikes
                             getLikedPosts()
@@ -425,7 +423,7 @@ class InstagramViewModel @Inject constructor(
                 text = text,
                 timeStamp = System.currentTimeMillis()
             )
-            database.collection(COMMENTS).document(commentId).set(comment)
+            database.collection(COMMENTS_COLLECTION).document(commentId).set(comment)
                 .addOnSuccessListener {
                     getComments(postId)
                 }
@@ -437,7 +435,7 @@ class InstagramViewModel @Inject constructor(
 
     fun getComments(postId: String?) {
         commentsProgress.value = true
-        database.collection(COMMENTS).whereEqualTo("postId", postId).get()
+        database.collection(COMMENTS_COLLECTION).whereEqualTo("postId", postId).get()
             .addOnSuccessListener { documents ->
                 val newComment = mutableListOf<CommentData>()
                 documents.forEach { doc ->
@@ -457,7 +455,7 @@ class InstagramViewModel @Inject constructor(
     private fun getLikedPosts() {
         likedPostProgress.value = true
         val currentUid = auth.currentUser?.uid
-        database.collection(POSTS).whereEqualTo("userId", currentUid).get()
+        database.collection(POSTS_COLLECTION).whereEqualTo("userId", currentUid).get()
             .addOnSuccessListener { snapshot ->
                 convertPosts(snapshot, likedPostList)
                 likedPostProgress.value = false
@@ -469,7 +467,7 @@ class InstagramViewModel @Inject constructor(
     }
 
     private fun getFollowers(uid: String?) {
-        database.collection(USERS).whereArrayContains("following", uid ?: "").get()
+        database.collection(USERS_COLLECTION).whereArrayContains("following", uid ?: "").get()
             .addOnSuccessListener { documents ->
                 followers.value = documents.size()
             }
@@ -477,7 +475,7 @@ class InstagramViewModel @Inject constructor(
 
     fun deletePost(postId: String) {
         val fireStore = FirebaseFirestore.getInstance()
-        val postsCollection = fireStore.collection(POSTS)
+        val postsCollection = fireStore.collection(POSTS_COLLECTION)
         postsCollection.document(postId).delete()
             .addOnSuccessListener {
                 popupNotification.value = Event("Post successfully deleted")

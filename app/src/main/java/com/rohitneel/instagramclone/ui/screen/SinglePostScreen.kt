@@ -354,11 +354,20 @@ fun ShowCommentScreen(
                         CommonProgressSpinner()
                     }
                 } else if (comments.isEmpty()) {
-                    Box(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "No comments yet", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "No comments yet",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Start the conversation.",
+                            fontSize = 12.sp
+                        )
                     }
                 } else {
                     LazyColumn(modifier = Modifier.weight(1f)) {

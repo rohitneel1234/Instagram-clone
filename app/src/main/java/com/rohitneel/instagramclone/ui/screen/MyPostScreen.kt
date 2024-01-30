@@ -163,9 +163,10 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
                     pressedElevation = 0.dp,
                     disabledElevation = 0.dp
                 ),
-                shape = RoundedCornerShape(10)
+                border = BorderStroke(width = 1.dp, color = Color.Gray),
+                shape = RoundedCornerShape(15)
             ) {
-                Text(text = "Edit profile", color = Color.Black)
+                Text(text = "Edit profile", color = Color.Black, fontWeight = FontWeight.SemiBold)
             }
             Spacer(modifier = Modifier.height(20.dp))
             PostTabView(

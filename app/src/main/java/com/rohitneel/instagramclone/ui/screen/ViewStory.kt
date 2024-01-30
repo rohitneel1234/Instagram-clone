@@ -72,7 +72,7 @@ fun ViewStory(navController: NavController, listOfImage: List<Int>) {
                     .size(32.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_instagram_app_logo),
+                    painter = painterResource(id = R.drawable.ic_instagram_logo),
                     contentDescription = null,
                     modifier = Modifier.wrapContentSize(),
                     contentScale = ContentScale.Crop
