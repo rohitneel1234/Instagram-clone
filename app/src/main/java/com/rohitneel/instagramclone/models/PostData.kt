@@ -24,8 +24,7 @@ data class PostData(
         parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.createStringArrayList(),
         parcel.createStringArrayList()
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(postId)
