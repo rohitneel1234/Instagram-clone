@@ -1,5 +1,5 @@
 # Instagram-clone
-It is an Instagram clone application developed using Jetpack compose, Hilt Dagger2, MVVM architecture, bottom navigation, and navigation graph.
+It is an Instagram clone social media application that allows users to share photos with their followers. Users can create an account, follow other users, and be followed by others. It is developed using Jetpack compose, Hilt Dagger2, MVVM architecture, bottom navigation, and navigation graph.
 ## Features:
 <ul dir="auto">
 <li>Signup, Login and Logout Screen</li>
