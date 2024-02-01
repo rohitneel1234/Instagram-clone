@@ -27,6 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
+import coil.size.Scale
+import coil.transform.CircleCropTransformation
 import com.rohitneel.instagramclone.common.NotificationMessage
 import com.rohitneel.instagramclone.navigation.AppNavHost
 import com.rohitneel.instagramclone.navigation.DestinationScreen
@@ -54,6 +58,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun InstagramApp() {
     val viewModel = hiltViewModel<InstagramViewModel>()
@@ -61,6 +66,18 @@ fun InstagramApp() {
     var showBottomBar by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
+    val userData = viewModel.userData.value
+    val profileIconPainter = userData?.imageUrl?.let {
+        rememberImagePainter(
+            data = it,
+            builder = {
+                // You can apply transformations or other settings here
+                transformations(CircleCropTransformation())
+                scale(Scale.FIT)
+                size(100)
+            }
+        )
+    } ?: painterResource(id = R.drawable.ic_posts)
 
     NotificationMessage(viewModel = viewModel)
 
@@ -95,8 +112,8 @@ fun InstagramApp() {
             bottomNavRoutes = DestinationScreen.Notifications
         ),
         BottomNavigationItems(
-            selectedIcon = painterResource(id = R.drawable.ic_posts),
-            unselectedIcon = painterResource(id = R.drawable.ic_posts),
+            selectedIcon = profileIconPainter,
+            unselectedIcon = profileIconPainter,
             bottomNavRoutes = DestinationScreen.MyPosts
         ),
     )
