@@ -16,13 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -39,7 +35,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,21 +42,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,13 +61,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonDivider
 import com.rohitneel.instagramclone.common.CommonImage
-import com.rohitneel.instagramclone.common.CommonProgressSpinner
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.ui.components.ToggleIconButton
+import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
 @Composable
 fun SinglePostScreen(navController: NavController, viewModel: InstagramViewModel, post: PostData) {
@@ -288,7 +278,6 @@ fun SinglePostDisplay(
                     .padding(start = 8.dp)
                     .clickable {
                         post.postId?.let {
-                            //navController.navigate(DestinationScreen.Comments.createRoute(it))
                             isCommentBottomSheetOpened.value = true
                         }
                     }
@@ -303,119 +292,6 @@ fun SinglePostDisplay(
                 viewModel = viewModel,
                 postId = it
             )
-        }
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShowCommentScreen(
-    isCommentBottomSheetOpened: MutableState<Boolean>,
-    viewModel: InstagramViewModel,
-    postId: String
-) {
-    val bottomSheet = rememberModalBottomSheetState()
-    var commentText by rememberSaveable { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
-    val comments = viewModel.comments.value
-    val commentsProgress = viewModel.commentsProgress.value
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    ModalBottomSheet(
-        sheetState = bottomSheet,
-        containerColor = Color.White,
-        onDismissRequest = {
-            isCommentBottomSheetOpened.value = false
-        }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column {
-                Text(
-                    text = "Comments",
-                    color = Color.Black,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center
-                )
-                CommonDivider()
-            }
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                if (commentsProgress) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        CommonProgressSpinner()
-                    }
-                } else if (comments.isEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "No comments yet",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Start the conversation.",
-                            fontSize = 12.sp
-                        )
-                    }
-                } else {
-                    LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(items = comments) { comment ->
-                            CommentRow(comment)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    TextField(
-                        value = commentText,
-                        onValueChange = { commentText = it },
-                        placeholder = { Text("Add a comment...") },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    viewModel.createComment(postId = postId, text = commentText)
-                                    commentText = ""
-                                    focusManager.clearFocus()
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_comment_send),
-                                    tint = Color.Blue,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboardController?.hide()
-                            }
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
-                }
-            }
         }
     }
 }

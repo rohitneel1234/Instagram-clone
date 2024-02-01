@@ -13,7 +13,6 @@ import com.rohitneel.instagramclone.auth.LoginScreen
 import com.rohitneel.instagramclone.auth.ProfileScreen
 import com.rohitneel.instagramclone.auth.SignupScreen
 import com.rohitneel.instagramclone.models.PostData
-import com.rohitneel.instagramclone.ui.screen.CommentsScreen
 import com.rohitneel.instagramclone.ui.screen.CreatePostMenu
 import com.rohitneel.instagramclone.ui.screen.FeedScreen
 import com.rohitneel.instagramclone.ui.screen.MyPostScreen
@@ -80,10 +79,6 @@ fun AppNavHost(
                     post = postData
                 )
             }
-        }
-        composable(DestinationScreen.Comments.route) { navBackStackEntry ->
-            val postId = navBackStackEntry.arguments?.getString("postId")
-            postId?.let { CommentsScreen(viewModel = viewModel, postId = it) }
         }
         composable(DestinationScreen.AddPostButton.route) {
             CreatePostMenu(navController = navController)

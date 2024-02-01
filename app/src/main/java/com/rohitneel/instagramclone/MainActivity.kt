@@ -77,7 +77,7 @@ fun InstagramApp() {
                 size(100)
             }
         )
-    } ?: painterResource(id = R.drawable.ic_posts)
+    } ?: painterResource(id = R.drawable.ic_profile_icon)
 
     NotificationMessage(viewModel = viewModel)
 

@@ -19,10 +19,6 @@ sealed class DestinationScreen(val route:String){
     }
     object SinglePost: DestinationScreen("singlepost")
 
-    object Comments: DestinationScreen("comments/{postId}") {
-        fun createRoute(postId: String) =  "comments/$postId"
-    }
-
     object AddPostButton: DestinationScreen("addpost")
 
     object Notifications: DestinationScreen("notifications")
