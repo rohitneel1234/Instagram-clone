@@ -22,12 +22,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -38,11 +38,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,9 +57,9 @@ import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
 import com.rohitneel.instagramclone.common.LikeAnimation
-import com.rohitneel.instagramclone.common.NavParams
+import com.rohitneel.instagramclone.common.ShowMoreOptionsBottomSheet
+import com.rohitneel.instagramclone.common.ShowPostActionIcons
 import com.rohitneel.instagramclone.common.UserImageCard
-import com.rohitneel.instagramclone.common.navigateTo
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.models.Stories
 import com.rohitneel.instagramclone.navigation.DestinationScreen
@@ -238,14 +240,21 @@ fun PostsList(
 ) {
     Box(modifier = modifier) {
         LazyColumn {
+            item {
+                HorizontalDivider(
+                    modifier = Modifier
+                        .alpha(0.3f),
+                    thickness = 1.dp,
+                    color = Color.LightGray
+                )
+            }
             items(items = posts) {
-                Post(post = it, currentUserId = currentUserId, viewModel = viewModel) {
-                    navigateTo(
-                        navController,
-                        DestinationScreen.SinglePost,
-                        NavParams("post", it)
-                    )
-                }
+                Post(
+                    post = it,
+                    currentUserId = currentUserId,
+                    viewModel = viewModel,
+                    navController = navController
+                )
             }
         }
         if (loading) {
@@ -259,79 +268,122 @@ fun Post(
     post: PostData,
     currentUserId: String,
     viewModel: InstagramViewModel,
-    onPostClick: () -> Unit
+    navController: NavController
 ) {
     val likeAnimation = remember { mutableStateOf(false) }
     val dislikeAnimation = remember { mutableStateOf(false) }
+    val isBottomSheetOpened = remember { mutableStateOf(false) }
+    val userData = viewModel.userData.value
+    val comments = viewModel.comments.value
 
-    Card(
-        shape = RoundedCornerShape(corner = CornerSize(4.dp)),
+    ShowMoreOptionsBottomSheet(
+        isBottomSheetOpened = isBottomSheetOpened,
+        navController = navController,
+        viewModel = viewModel,
+        post = post
+    )
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(top = 4.dp, bottom = 4.dp)
+            .background(Color.White)
+            .padding(bottom = 10.dp),
     ) {
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(Color.White),
-                verticalAlignment = Alignment.CenterVertically
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(Color.White),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Card(
+                shape = CircleShape, modifier = Modifier
+                    .padding(4.dp)
+                    .size(32.dp)
             ) {
-                Card(
-                    shape = CircleShape, modifier = Modifier
-                        .padding(4.dp)
-                        .size(32.dp)
-                ) {
-                    CommonImage(data = post.userImage, contentScale = ContentScale.Crop)
-                }
-                Text(
-                    text = post.userName ?: "",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(4.dp)
-                )
+                CommonImage(data = post.userImage, contentScale = ContentScale.Crop)
             }
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                val modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 150.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onDoubleTap = {
-                                if (post.likes?.contains(currentUserId) == true) {
-                                    dislikeAnimation.value = true
-                                } else {
-                                    likeAnimation.value = true
-                                }
-                                viewModel.onLikePost(post)
-                            },
-                            onTap = {
-                                onPostClick.invoke()
-                            }
-                        )
+            Text(
+                text = post.userName ?: "",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(4.dp)
+            )
+             if (userData?.following?.contains(post.userId) == true) {
+                Text(
+                    text = "Following",
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .padding(start = 24.dp)
+                        .clickable {
+                            viewModel.onFollowClick(post.userId!!)
+                        })
+            } else if (userData?.userId != post.userId) {
+                Text(
+                    text = "Follow",
+                    color = colorResource(id = R.color.blue),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(start = 24.dp)
+                        .clickable {
+                            viewModel.onFollowClick(post.userId!!)
+                        })
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(
+                onClick = {
+                    if (userData?.userId == post.userId) {
+                        isBottomSheetOpened.value = true
                     }
-                CommonImage(
-                    data = post.postImage,
-                    modifier = modifier,
-                    contentScale = ContentScale.FillWidth
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = null,
+                    modifier = Modifier.padding(8.dp)
                 )
-
-                if (likeAnimation.value) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        delay(1000L)
-                        likeAnimation.value = false
-                    }
-                    LikeAnimation()
-                }
-                if (dislikeAnimation.value) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        delay(1000L)
-                        dislikeAnimation.value = false
-                    }
-                    LikeAnimation()
-                }
             }
         }
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            val modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 150.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onDoubleTap = {
+                            if (post.likes?.contains(currentUserId) == true) {
+                                dislikeAnimation.value = true
+                            } else {
+                                likeAnimation.value = true
+                            }
+                            viewModel.onLikePost(post)
+                        }
+                    )
+                }
+            CommonImage(
+                data = post.postImage,
+                modifier = modifier,
+                contentScale = ContentScale.FillWidth
+            )
+
+            if (likeAnimation.value) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(1000L)
+                    likeAnimation.value = false
+                }
+                LikeAnimation()
+            }
+            if (dislikeAnimation.value) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(1000L)
+                    dislikeAnimation.value = false
+                }
+                LikeAnimation()
+            }
+        }
+        ShowPostActionIcons(
+            viewModel = viewModel,
+            post = post,
+            numberOfComments = comments.size
+        )
     }
 }
