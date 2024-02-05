@@ -19,7 +19,7 @@ It is an Instagram clone social media application that allows users to share pho
 <li>Kotlin</li>
 <li>MVVM architecture</li>
 <li>Jetpack compose for Design</li>
-<li>Navigation Graph and Bottom Navigation Bar</li>
+<li>Navigation Graph, Top Bar and Bottom Navigation Bar</li>
 <li>Hilt Dagger</li>
 <li>Firebase Authentication and Storage</li>
 <li>Single Activity design pattern</li>
