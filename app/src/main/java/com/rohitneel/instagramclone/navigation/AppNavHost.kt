@@ -7,7 +7,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import com.rohitneel.instagramclone.auth.LoginScreen
 import com.rohitneel.instagramclone.auth.ProfileScreen
@@ -20,6 +19,7 @@ import com.rohitneel.instagramclone.ui.screen.NewPostScreen
 import com.rohitneel.instagramclone.ui.screen.NotificationsScreen
 import com.rohitneel.instagramclone.ui.screen.SearchScreen
 import com.rohitneel.instagramclone.ui.screen.SinglePostScreen
+import com.rohitneel.instagramclone.ui.screen.UserFollowerListScreen
 import com.rohitneel.instagramclone.ui.screen.ViewStory
 
 @Composable
@@ -89,9 +89,36 @@ fun AppNavHost(
                 viewModel = viewModel
             )
         }
-        composable(DestinationScreen.ViewStory.route) {
-            val listOfImage = listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
-            ViewStory(navController = navController, listOfImage = listOfImage, )
+        composable(
+            DestinationScreen.ViewStory.route,
+            arguments = listOf(
+                navArgument("listOfImage") {
+                    type = NavType.StringType
+                },
+                navArgument("imageUri") {
+                    type = NavType.StringType
+                }
+        )) { navBackStackEntry ->
+            val listOfImages = navBackStackEntry.arguments?.getString("listOfImage") ?: ""
+            val imageUri = navBackStackEntry.arguments?.getString("imageUri")
+            imageUri?.let {
+                ViewStory(navController = navController, jsonString = listOfImages, encodedUri = it)
+            }
+        }
+        composable(
+            DestinationScreen.FollowList.route,
+            arguments = listOf(
+                navArgument("isFollowing") {
+                    type = NavType.BoolType
+                }
+            )
+        ) {
+            val isFollower = it.arguments?.getBoolean("isFollowing") ?: false
+            UserFollowerListScreen(
+                viewModel = viewModel,
+                navController = navController,
+                isFollowing = isFollower
+            )
         }
     }
 
