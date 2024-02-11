@@ -35,6 +35,5 @@ class Constants {
 
         // Storage
         const val IMAGES_PATH = "images/"
-        const val STORIES_PATH = "stories/"
     }
 }
