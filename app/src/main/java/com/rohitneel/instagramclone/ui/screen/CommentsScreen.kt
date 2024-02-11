@@ -2,6 +2,7 @@ package com.rohitneel.instagramclone.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,11 +31,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -51,6 +54,7 @@ import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonDivider
 import com.rohitneel.instagramclone.common.CommonImage
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
+import com.rohitneel.instagramclone.common.DeleteCommentDialog
 import com.rohitneel.instagramclone.models.CommentData
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
@@ -59,7 +63,8 @@ import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 fun ShowCommentScreen(
     isCommentBottomSheetOpened: MutableState<Boolean>,
     viewModel: InstagramViewModel,
-    postId: String
+    postId: String,
+    postUserId: String?
 ) {
     val bottomSheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var commentText by rememberSaveable { mutableStateOf("") }
@@ -68,6 +73,7 @@ fun ShowCommentScreen(
     val commentsProgress = viewModel.commentsProgress.value
     val keyboardController = LocalSoftwareKeyboardController.current
     val userImage = viewModel.userData.value?.imageUrl
+    val userId = viewModel.userData.value?.userId
 
     ModalBottomSheet(
         sheetState = bottomSheet,
@@ -122,7 +128,7 @@ fun ShowCommentScreen(
                     }
                 } else {
                     items(items = comments) {comment ->
-                        CommentRow(comment)
+                        CommentRow(comment, userId, postUserId, viewModel)
                     }
                 }
             }
@@ -191,11 +197,27 @@ fun ShowCommentScreen(
 }
 
 @Composable
-fun CommentRow(comment: CommentData) {
+fun CommentRow(
+    comment: CommentData,
+    userId: String?,
+    postUserId: String?,
+    viewModel: InstagramViewModel
+) {
+    var isCommentSelected by remember { mutableStateOf(false) }
+    val modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onTap = {
+                    if (userId == postUserId) {
+                        isCommentSelected = true
+                    }
+                }
+            )
+        }
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
@@ -210,5 +232,14 @@ fun CommentRow(comment: CommentData) {
             Text(text = comment.userName ?: "", fontSize = 12.sp, fontWeight = FontWeight.Bold)
             Text(text = comment.text ?: "", fontSize = 14.sp)
         }
+    }
+    if (isCommentSelected) {
+        DeleteCommentDialog(
+            onConfirm = {
+                comment.commentId?.let { it1 -> viewModel.deleteComment(it1) }
+                isCommentSelected = false
+            },
+            onCancel = { isCommentSelected = false }
+        )
     }
 }

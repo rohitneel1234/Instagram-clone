@@ -39,21 +39,39 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import java.lang.Exception
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalCoilApi::class)
 @Composable
-fun ViewStory(navController: NavController, listOfImage: List<Int>) {
+fun ViewStory(navController: NavController, jsonString: String, encodedUri: String) {
+    val listOfImage: List<Int> = if (jsonString.isEmpty()) emptyList() else {
+        try {
+            Json.decodeFromString(jsonString)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+    val imageUri by remember { mutableStateOf(encodedUri) }
     val pagerState = rememberPagerState(pageCount = { listOfImage.size })
     val coroutineScope = rememberCoroutineScope()
     var currentPage by remember { mutableStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(state = pagerState) {
+            val painter = if (jsonString.isEmpty()) {
+                rememberImagePainter(data = imageUri)
+            } else {
+                painterResource(id = listOfImage[it])
+            }
             Image(
-                painter = painterResource(id = listOfImage[it]),
+                painter = painter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()

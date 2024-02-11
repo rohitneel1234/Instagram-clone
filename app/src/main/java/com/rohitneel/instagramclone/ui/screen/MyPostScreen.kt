@@ -25,9 +25,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -134,18 +131,26 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
                         .align(Alignment.CenterVertically)
                 )
                 StateItem(
-                    title = "Followers",
+                    title = "FollowList",
                     count = "$followers",
                     modifier = Modifier
                         .weight(1f)
-                        .align(Alignment.CenterVertically)
+                        .align(Alignment.CenterVertically),
+                    onClick = {
+                        val route = DestinationScreen.FollowList.createRoute(false)
+                        navController.navigate(route)
+                    }
                 )
                 StateItem(
                     title = "Following",
                     count = "${userData?.following?.size ?: 0}",
                     modifier = Modifier
                         .weight(1f)
-                        .align(Alignment.CenterVertically)
+                        .align(Alignment.CenterVertically),
+                    onClick = {
+                        val route = DestinationScreen.FollowList.createRoute(true)
+                        navController.navigate(route)
+                    }
                 )
             }
             Column(modifier = Modifier.padding(8.dp)) {
@@ -283,11 +288,12 @@ fun StateItem(
     title: String,
     count: String,
     modifier: Modifier,
+    onClick: () -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround,
-        modifier = modifier
+        modifier = modifier.clickable { onClick() }
     ) {
         Text(
             text = count,

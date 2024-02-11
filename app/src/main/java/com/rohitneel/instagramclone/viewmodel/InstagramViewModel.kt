@@ -15,6 +15,7 @@ import com.rohitneel.instagramclone.core.Constants.Companion.POSTS_COLLECTION
 import com.rohitneel.instagramclone.core.Constants.Companion.USERS_COLLECTION
 import com.rohitneel.instagramclone.models.CommentData
 import com.rohitneel.instagramclone.models.Event
+import com.rohitneel.instagramclone.models.UserFollowConnections
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.models.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,6 +47,8 @@ class InstagramViewModel @Inject constructor(
     val likedPostProgress = mutableStateOf(false)
 
     val followers = mutableStateOf(0)
+    val followerListItem = mutableStateOf<List<UserFollowConnections>>(emptyList())
+    val followingListItem = mutableStateOf<List<UserFollowConnections>>(emptyList())
 
     init {
         val currentUser = auth.currentUser
@@ -159,6 +162,8 @@ class InstagramViewModel @Inject constructor(
                 refreshPosts()
                 getPersonalizedFeed()
                 getFollowers(user?.userId)
+                getFollowerListItem(user?.userId)
+                getFollowingListItem(user?.userId)
             }
             .addOnFailureListener { exception ->
                 handleException(exception, "Cannot retrieve user model")
@@ -235,6 +240,8 @@ class InstagramViewModel @Inject constructor(
         postFeed.value = listOf()
         comments.value = listOf()
         likedPostList.value = listOf()
+        followerListItem.value = listOf()
+        followingListItem.value = listOf()
     }
 
     fun onNewPost(uri: Uri, description: String, onPostSuccess: () -> Unit) {
@@ -478,11 +485,90 @@ class InstagramViewModel @Inject constructor(
         val postsCollection = fireStore.collection(POSTS_COLLECTION)
         postsCollection.document(postId).delete()
             .addOnSuccessListener {
-                popupNotification.value = Event("Post successfully deleted")
+                popupNotification.value = Event("Post deleted")
                 refreshPosts()
             }
             .addOnFailureListener { exception ->
                 handleException(exception, "Failed to delete post")
+            }
+    }
+
+    fun deleteComment(commentId: String) {
+        val fireStore = FirebaseFirestore.getInstance()
+        val postsCollection = fireStore.collection(COMMENTS_COLLECTION)
+        postsCollection.document(commentId).delete()
+            .addOnSuccessListener {
+                popupNotification.value = Event("Comment deleted")
+            }
+            .addOnFailureListener { exception ->
+                handleException(exception, "Unable to delete comment")
+            }
+    }
+
+    private fun getFollowerListItem(uid: String?) {
+        val followersList = mutableListOf<UserFollowConnections>()
+        database.collection(USERS_COLLECTION)
+            .whereArrayContains("following", uid ?: "")
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    // Assuming each document contains a field "name" representing the follower's name
+                    val name = document.getString("name")
+                    val imageUri = document.getString("imageUrl")
+                    if (name != null && imageUri != null) {
+                        followersList.add(UserFollowConnections(name, imageUri))
+                    }
+                }
+                // Update the followers list
+                followerListItem.value = followersList
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors
+                handleException(exception, "Unable to fetch followers list")
+            }
+    }
+
+    private fun getFollowingListItem(uid: String?) {
+        val followingList = mutableListOf<UserFollowConnections>()
+        database.collection(USERS_COLLECTION)
+            .document(uid ?: "")
+            .get()
+            .addOnSuccessListener { document ->
+                val followingArray = document.get("following") as? List<String>
+                followingArray?.let { followingIds ->
+                    for (followingId in followingIds) {
+                        // Fetch the details of each following user
+                        database.collection(USERS_COLLECTION)
+                            .document(followingId)
+                            .get()
+                            .addOnSuccessListener { followingDocument ->
+                                val name = followingDocument.getString("name")
+                                val imageUri = followingDocument.getString("imageUrl")
+                                name?.let { validName ->
+                                    imageUri?.let { validImageUri ->
+                                        followingList.add(
+                                            UserFollowConnections(
+                                                validName,
+                                                validImageUri
+                                            )
+                                        )
+                                        // If all following have been fetched, update the list
+                                        if (followingList.size == followingIds.size) {
+                                            followingListItem.value = followingList
+                                        }
+                                    }
+                                }
+                            }
+                            .addOnFailureListener { exception ->
+                                // Handle failures to fetch following details
+                                handleException(exception, "Unable to fetch following details")
+                            }
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                // Handle failures to fetch user document
+                handleException(exception, "Error in fetching user document")
             }
     }
 

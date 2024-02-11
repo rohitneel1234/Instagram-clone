@@ -23,5 +23,14 @@ sealed class DestinationScreen(val route:String){
 
     object Notifications: DestinationScreen("notifications")
 
-    object ViewStory: DestinationScreen("viewstory")
+    object ViewStory: DestinationScreen("viewstory/{listOfImage}/{imageUri}") {
+        fun createRoute(listOfImage: String? = "", uri: String? = ""): String {
+            val formattedUri = if (uri.isNullOrEmpty()) "empty" else uri
+            val formattedListOfImage = listOfImage?.ifEmpty { "listOfImage" }
+            return "viewstory/$formattedListOfImage/$formattedUri"
+        }
+    }
+    object FollowList: DestinationScreen("followers/{isFollowing}") {
+        fun createRoute(isFollowing: Boolean) = "followers/$isFollowing"
+    }
 }

@@ -301,7 +301,8 @@ fun ShowPostActionIcons(
             ShowCommentScreen(
                 isCommentBottomSheetOpened = isCommentBottomSheetOpened,
                 viewModel = viewModel,
-                postId = it
+                postId = it,
+                postUserId = post.userId
             )
         }
     }
@@ -483,6 +484,46 @@ fun DeleteConfirmationDialog(
                         text = "Cancel",
                         fontSize = 15.sp,
                         color = colorResource(id = R.color.black)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteCommentDialog(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onCancel,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    ) {
+        Surface(tonalElevation = 8.dp, shape = RoundedCornerShape(8.dp)) {
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier
+                        .width(180.dp)
+                        .clickable { onConfirm() },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Delete",
+                        fontSize = 16.sp,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_delete),
+                        contentDescription = "delete",
+                        tint = Color.Red
                     )
                 }
             }

@@ -1,5 +1,8 @@
 package com.rohitneel.instagramclone.ui.screen
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,8 +37,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -69,6 +75,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +86,7 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
     val userData = viewModel.userData.value
     val personalizedFeed = viewModel.postFeed.value
     val personalizedFeedLoading = viewModel.postFeedProgress.value
+    var isAddToStory by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -130,7 +139,7 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
             Column {
                 Box(
                     modifier = Modifier
-                        .clickable { }
+                        .clickable { isAddToStory = true }
                 ) {
                     UserImageCard(userImage = userData?.imageUrl)
                     Card(
@@ -169,6 +178,27 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
             viewModel = viewModel,
             currentUserId = userData?.userId ?: ""
         )
+    }
+    if (isAddToStory) {
+        CreateStory(navController = navController)
+    }
+}
+
+@Composable
+fun CreateStory(navController: NavController) {
+    val newStoryImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri ->
+        uri?.let {
+            val encoded = Uri.encode(it.toString())
+            val route = DestinationScreen.NewPost.createRoute(encoded, true)
+            navController.navigate(route)
+            /*val route = DestinationScreen.ViewStory.createRoute(encoded)
+            navController.navigate(route)*/
+        }
+    }
+    LaunchedEffect(true) {
+        newStoryImageLauncher.launch("image/*")
     }
 }
 
@@ -211,7 +241,10 @@ fun StoryItem(story: Stories, navController: NavController) {
                 .padding(5.dp)
                 .clip(CircleShape)
                 .clickable {
-                    navController.navigate(DestinationScreen.ViewStory.route)
+                    val listOfImage = listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
+                    val jsonString = Json.encodeToString(listOfImage)
+                    val route = DestinationScreen.ViewStory.createRoute(jsonString)
+                    navController.navigate(route)
                 },
             contentScale = ContentScale.Crop
         )
