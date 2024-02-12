@@ -131,7 +131,7 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
                         .align(Alignment.CenterVertically)
                 )
                 StateItem(
-                    title = "FollowList",
+                    title = "Follower",
                     count = "$followers",
                     modifier = Modifier
                         .weight(1f)
