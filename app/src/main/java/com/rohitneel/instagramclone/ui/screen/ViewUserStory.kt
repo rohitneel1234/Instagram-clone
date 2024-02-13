@@ -35,37 +35,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.rohitneel.instagramclone.R
+import com.rohitneel.instagramclone.navigation.DestinationScreen
+import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import java.lang.Exception
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalCoilApi::class)
 @Composable
-fun ViewStory(navController: NavController, jsonString: String) {
-    val listOfImage: List<Int> = if (jsonString.isEmpty()) emptyList() else {
-        try {
-            Json.decodeFromString(jsonString)
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
+fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel, imageUri: String) {
+    val listOfImage = fetchImages(imageUri)
     val pagerState = rememberPagerState(pageCount = { listOfImage.size })
     val coroutineScope = rememberCoroutineScope()
     var currentPage by remember { mutableStateOf(0) }
+    val userData = viewModel.userData.value
 
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(state = pagerState) {
             Image(
-                painter = painterResource(id = listOfImage[it]),
+                painter = rememberImagePainter(imageUri),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -84,18 +76,20 @@ fun ViewStory(navController: NavController, jsonString: String) {
                     .size(32.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_instagram_logo),
+                    painter = rememberImagePainter(data = userData?.imageUrl),
                     contentDescription = null,
                     modifier = Modifier.wrapContentSize(),
                     contentScale = ContentScale.Crop
                 )
             }
-            Text(
-                text = "Instagram",
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(4.dp)
-            )
+            userData?.userName?.let {
+                Text(
+                    text = it,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
         }
         Row(
             modifier = Modifier
@@ -106,7 +100,7 @@ fun ViewStory(navController: NavController, jsonString: String) {
             Spacer(modifier = Modifier.padding(4.dp))
 
             for (index in listOfImage.indices) {
-                LinearIndicator(
+                StoryLinearIndicator(
                     modifier = Modifier.weight(1f),
                     startProgress = index == currentPage
                 ) {
@@ -116,7 +110,7 @@ fun ViewStory(navController: NavController, jsonString: String) {
                             pagerState.animateScrollToPage(currentPage)
                         }
                         if (currentPage == listOfImage.size) {
-                            navController.popBackStack()
+                            navController.navigate(DestinationScreen.Feed.route)
                         }
                     }
                 }
@@ -126,8 +120,15 @@ fun ViewStory(navController: NavController, jsonString: String) {
     }
 }
 
+/**
+ * Fetch the list of images from your data source
+ */
+fun fetchImages(imageUri: String): List<Image> {
+    return listOf(Image(1, imageUri))
+}
+
 @Composable
-fun LinearIndicator(
+fun StoryLinearIndicator(
     modifier: Modifier,
     startProgress: Boolean = false,
     onAnimationEnd: () -> Unit
@@ -160,3 +161,5 @@ fun LinearIndicator(
         color = Color.White,
     )
 }
+
+data class Image(val id: Int, val uri: String)

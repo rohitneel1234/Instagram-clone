@@ -52,7 +52,8 @@ fun NewPostScreen(
     navController: NavController,
     viewModel: InstagramViewModel,
     encodedUri: String,
-    isMyPostScreen: Boolean
+    isMyPostScreen: Boolean,
+    isUserStory: Boolean
 ) {
     val imageUri by remember { mutableStateOf(encodedUri) }
     var description by rememberSaveable { mutableStateOf("") }
@@ -73,7 +74,7 @@ fun NewPostScreen(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "back",
                 modifier = Modifier.clickable {
-                    if (isMyPostScreen) {
+                    if (isMyPostScreen || isUserStory) {
                         navController.navigate(DestinationScreen.Feed.route)
                     } else {
                         navController.popBackStack()
@@ -81,7 +82,7 @@ fun NewPostScreen(
                 }
             )
             Text(
-                text = "New post",
+                text = if (isUserStory) "New Story" else "New post",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(start = 16.dp)
@@ -123,10 +124,13 @@ fun NewPostScreen(
             Button(
                 onClick = {
                     focusManager.clearFocus()
-                    viewModel.onNewPost(Uri.parse(imageUri), description) {
-                        navController.navigate(
-                            DestinationScreen.MyPosts.route
-                        )
+                    if (isUserStory) {
+                        val route = DestinationScreen.ViewUserStory.createRoute(uri = Uri.parse(encodedUri))
+                        navController.navigate(route)
+                    } else {
+                        viewModel.onNewPost(Uri.parse(imageUri), description) {
+                            navController.navigate(DestinationScreen.MyPosts.route)
+                        }
                     }
                 },
                 modifier = Modifier

@@ -1,5 +1,7 @@
 package com.rohitneel.instagramclone.navigation
 
+import android.net.Uri
+
 sealed class DestinationScreen(val route:String){
 
     object Signup: DestinationScreen("signup")
@@ -14,8 +16,8 @@ sealed class DestinationScreen(val route:String){
 
     object Profile: DestinationScreen("profile")
 
-    object NewPost: DestinationScreen("newpost/{imageUri}/{isMyPostScreen}") {
-        fun createRoute(uri: String, isMyPostScreen: Boolean) = "newpost/$uri/$isMyPostScreen"
+    object NewPost: DestinationScreen("newpost/{imageUri}/{isMyPostScreen}/{isUserStory}") {
+        fun createRoute(uri: String, isMyPostScreen: Boolean? = false, isUserStory: Boolean? = false) = "newpost/$uri/$isMyPostScreen/$isUserStory"
     }
     object SinglePost: DestinationScreen("singlepost")
 
@@ -23,11 +25,16 @@ sealed class DestinationScreen(val route:String){
 
     object Notifications: DestinationScreen("notifications")
 
-    object ViewStory: DestinationScreen("viewstory/{listOfImage}/{imageUri}") {
-        fun createRoute(listOfImage: String? = "", uri: String? = ""): String {
-            val formattedUri = if (uri.isNullOrEmpty()) "empty" else uri
-            val formattedListOfImage = listOfImage?.ifEmpty { "listOfImage" }
-            return "viewstory/$formattedListOfImage/$formattedUri"
+    object ViewStory: DestinationScreen("viewstory/{listOfImage}") {
+        fun createRoute(listOfImage: String? = ""): String {
+            val formattedListOfImage = listOfImage ?: "listOfImage"
+            return "viewstory/$formattedListOfImage"
+        }
+    }
+    object ViewUserStory: DestinationScreen("viewuserstory/{imageUri}") {
+        fun createRoute(uri: Uri): String {
+            val encodedUri = Uri.encode(uri.toString())
+            return "viewuserstory/$encodedUri"
         }
     }
     object FollowList: DestinationScreen("followers/{isFollowing}") {

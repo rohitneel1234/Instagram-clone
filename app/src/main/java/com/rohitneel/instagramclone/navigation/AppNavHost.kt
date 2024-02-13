@@ -21,6 +21,7 @@ import com.rohitneel.instagramclone.ui.screen.SearchScreen
 import com.rohitneel.instagramclone.ui.screen.SinglePostScreen
 import com.rohitneel.instagramclone.ui.screen.UserFollowerListScreen
 import com.rohitneel.instagramclone.ui.screen.ViewStory
+import com.rohitneel.instagramclone.ui.screen.ViewUserStory
 
 @Composable
 fun AppNavHost(
@@ -59,12 +60,16 @@ fun AppNavHost(
                 },
                 navArgument("isMyPostScreen") {
                     type = NavType.BoolType
+                },
+                navArgument("isUserStory") {
+                    type = NavType.BoolType
                 }
         )) { navBackStackEntry ->
             val imageUri = navBackStackEntry.arguments?.getString("imageUri")
             val isMyPostScreen = navBackStackEntry.arguments?.getBoolean("isMyPostScreen") ?: false
+            val isUserStory = navBackStackEntry.arguments?.getBoolean("isUserStory") ?: false
             imageUri?.let {
-                NewPostScreen(navController = navController, viewModel = viewModel, encodedUri = it, isMyPostScreen = isMyPostScreen)
+                NewPostScreen(navController = navController, viewModel = viewModel, encodedUri = it, isMyPostScreen = isMyPostScreen, isUserStory = isUserStory)
             }
         }
         composable(DestinationScreen.SinglePost.route) {
@@ -94,15 +99,23 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument("listOfImage") {
                     type = NavType.StringType
-                },
+                }
+            )
+        ) { navBackStackEntry ->
+            val listOfImages = navBackStackEntry.arguments?.getString("listOfImage") ?: ""
+            ViewStory(navController = navController, jsonString = listOfImages)
+        }
+        composable(
+            DestinationScreen.ViewUserStory.route,
+            arguments = listOf(
                 navArgument("imageUri") {
                     type = NavType.StringType
                 }
-        )) { navBackStackEntry ->
-            val listOfImages = navBackStackEntry.arguments?.getString("listOfImage") ?: ""
+            )
+        ) { navBackStackEntry ->
             val imageUri = navBackStackEntry.arguments?.getString("imageUri")
             imageUri?.let {
-                ViewStory(navController = navController, jsonString = listOfImages, encodedUri = it)
+                ViewUserStory(navController = navController, viewModel = viewModel, imageUri = it)
             }
         }
         composable(

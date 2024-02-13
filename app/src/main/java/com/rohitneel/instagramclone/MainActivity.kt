@@ -87,6 +87,7 @@ fun InstagramApp() {
         DestinationScreen.Profile.route -> false // here too
         DestinationScreen.NewPost.route -> false // here too
         DestinationScreen.ViewStory.route -> false // here too
+        DestinationScreen.ViewUserStory.route -> false // here too
         else -> true // in all other cases show bottom bar
     }
 

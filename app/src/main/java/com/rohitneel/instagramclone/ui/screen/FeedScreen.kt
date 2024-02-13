@@ -191,10 +191,8 @@ fun CreateStory(navController: NavController) {
     ) { uri ->
         uri?.let {
             val encoded = Uri.encode(it.toString())
-            val route = DestinationScreen.NewPost.createRoute(encoded, true)
+            val route = DestinationScreen.NewPost.createRoute(encoded, isUserStory = true)
             navController.navigate(route)
-            /*val route = DestinationScreen.ViewStory.createRoute(encoded)
-            navController.navigate(route)*/
         }
     }
     LaunchedEffect(true) {
