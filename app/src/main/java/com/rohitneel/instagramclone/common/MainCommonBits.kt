@@ -122,7 +122,8 @@ fun CheckSignedIn(navController: NavController, viewModel: InstagramViewModel) {
     val signedIn = viewModel.signedIn.value
     if (signedIn && !alreadyLoggedIn.value) {
         alreadyLoggedIn.value = true
-        navController.navigate(DestinationScreen.Feed.route) {
+        val route = DestinationScreen.Feed.createRoute(isUserStory = false)
+        navController.navigate(route) {
             popUpTo(0)
         }
     }

@@ -132,7 +132,15 @@ fun InstagramApp() {
                             selected = selectedItemIndex == index,
                             onClick = {
                                 selectedItemIndex = index
-                                navController.navigate(item.bottomNavRoutes.route)
+                                when (item.bottomNavRoutes) {
+                                    is DestinationScreen.Feed -> {
+                                        val route = item.bottomNavRoutes.createRoute(isUserStory = false)
+                                        navController.navigate(route)
+                                    }
+                                    else -> {
+                                        navController.navigate(item.bottomNavRoutes.route)
+                                    }
+                                }
                             },
                             icon = {
                                 BadgedBox(

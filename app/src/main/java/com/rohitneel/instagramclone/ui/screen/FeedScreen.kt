@@ -48,6 +48,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
@@ -59,6 +60,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
@@ -80,7 +83,7 @@ import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
+fun FeedScreen(navController: NavController, viewModel: InstagramViewModel, isUserStory: Boolean) {
 
     val userDataLoading = viewModel.inProgress.value
     val userData = viewModel.userData.value
@@ -139,9 +142,19 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
             Column {
                 Box(
                     modifier = Modifier
-                        .clickable { isAddToStory = true }
+                        .clickable {
+                            if (isUserStory) {
+                                navController.navigate(DestinationScreen.ViewUserStory.route)
+                            } else {
+                                isAddToStory = true
+                            }
+                        }
                 ) {
-                    UserImageCard(userImage = userData?.imageUrl)
+                    if (isUserStory) {
+                        UserStoryImageCard(userImage = userData?.imageUrl)
+                    } else {
+                        UserImageCard(userImage = userData?.imageUrl)
+                    }
                     Card(
                         shape = CircleShape,
                         border = BorderStroke(width = 2.dp, color = Color.White),
@@ -181,6 +194,45 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
     }
     if (isAddToStory) {
         CreateStory(navController = navController)
+    }
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Composable
+fun UserStoryImageCard(
+    userImage: String?,
+    modifier: Modifier = Modifier
+        .padding(horizontal = 8.dp, vertical = 6.dp)
+) {
+    Card(shape = CircleShape, modifier = modifier) {
+        if (userImage.isNullOrEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_user),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.Gray),
+                modifier = modifier.size(60.dp)
+            )
+        } else {
+            Image(
+                painter = rememberImagePainter(data = userImage),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(60.dp)
+                    .border(
+                        width = 2.dp,
+                        brush = Brush.linearGradient(
+                            listOf(
+                                Color("#43A047".toColorInt()),
+                                Color("#03DAC5".toColorInt())
+                            )
+                        ),
+                        shape = CircleShape
+                    )
+                    .padding(5.dp)
+                    .clip(CircleShape),
+                contentScale =  ContentScale.Crop
+            )
+        }
     }
 }
 

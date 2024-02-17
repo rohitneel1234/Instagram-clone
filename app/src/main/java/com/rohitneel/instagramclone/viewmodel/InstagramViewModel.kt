@@ -12,12 +12,14 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.rohitneel.instagramclone.core.Constants.Companion.COMMENTS_COLLECTION
 import com.rohitneel.instagramclone.core.Constants.Companion.POSTS_COLLECTION
+import com.rohitneel.instagramclone.core.Constants.Companion.STORIES_COLLECTION
 import com.rohitneel.instagramclone.core.Constants.Companion.USERS_COLLECTION
 import com.rohitneel.instagramclone.models.CommentData
 import com.rohitneel.instagramclone.models.Event
 import com.rohitneel.instagramclone.models.UserFollowConnections
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.models.UserData
+import com.rohitneel.instagramclone.models.UserStoryInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import javax.inject.Inject
@@ -35,7 +37,9 @@ class InstagramViewModel @Inject constructor(
     val popupNotification = mutableStateOf<Event<String>?>(null)
 
     val refreshPostsProgress = mutableStateOf(false)
+    val refreshStoryProgress = mutableStateOf(false)
     val posts = mutableStateOf<List<PostData>>(listOf())
+    val stories = mutableStateOf<UserStoryInfo?>(null)
     val searchedPost = mutableStateOf<List<PostData>>(listOf())
     val searchedPostProgress = mutableStateOf(false)
 
@@ -199,6 +203,23 @@ class InstagramViewModel @Inject constructor(
             }
     }
 
+    private fun uploadStory(uri: Uri, onSuccess: (Uri) -> Unit) {
+        inProgress.value = true
+        val storageRef = storage.reference
+        val uuid = UUID.randomUUID()
+        val imageRef = storageRef.child("stories/$uuid")
+        val uploadTask = imageRef.putFile(uri)
+        uploadTask
+            .addOnSuccessListener {
+                val result = it.metadata?.reference?.downloadUrl
+                result?.addOnSuccessListener(onSuccess)
+            }
+            .addOnFailureListener { exe ->
+                handleException(exe)
+                inProgress.value = false
+            }
+    }
+
     fun uploadProfileImage(uri: Uri) {
         uploadImage(uri) {
             createOrUpdateProfile(imageUrl = it.toString())
@@ -250,6 +271,12 @@ class InstagramViewModel @Inject constructor(
         }
     }
 
+    fun onNewStory(uri: Uri, onPostSuccess: () -> Unit) {
+        uploadStory(uri) {
+            onCreateStory(it, onPostSuccess)
+        }
+    }
+
     private fun onCreatePost(imageUri: Uri, description: String, onPostSuccess: () -> Unit) {
         inProgress.value = true
         val currentUid = auth.currentUser?.uid
@@ -292,6 +319,35 @@ class InstagramViewModel @Inject constructor(
         }
     }
 
+    private fun onCreateStory(imageUri: Uri, onPostSuccess: () -> Unit) {
+        inProgress.value = true
+        val currentUid = auth.currentUser?.uid
+        if (currentUid != null) {
+            val storyUuid = UUID.randomUUID().toString()
+
+            val story = UserStoryInfo(
+                storyId = storyUuid,
+                userId = currentUid,
+                story = imageUri.toString()
+            )
+            database.collection(STORIES_COLLECTION).document(storyUuid).set(story)
+                .addOnSuccessListener {
+                    popupNotification.value = Event("Story created")
+                    inProgress.value = false
+                    getStoryData()
+                    onPostSuccess.invoke()
+                }
+                .addOnFailureListener { exe ->
+                    handleException(exe, "Unable to create story")
+                    inProgress.value = false
+                }
+        } else {
+            handleException(customMessage = "Error: username unavailable. Unable to create story")
+            onLogout()
+            inProgress.value = false
+        }
+    }
+
     private fun refreshPosts() {
         val currentUid = auth.currentUser?.uid
         if (currentUid != null) {
@@ -307,6 +363,32 @@ class InstagramViewModel @Inject constructor(
                 }
         } else {
             handleException(customMessage = "Error: username unavailable. Unable to refresh posts")
+            onLogout()
+        }
+    }
+
+    private fun getStoryData() {
+        val currentUid = auth.currentUser?.uid
+        if (currentUid != null) {
+            refreshStoryProgress.value = true
+            database.collection(STORIES_COLLECTION).whereEqualTo("userId", currentUid)
+                .limit(1)
+                .get()    // Limit the result to only 1 document (the most recent one).get()
+                .addOnSuccessListener { documents ->
+                    val userStories = mutableListOf<UserStoryInfo>()
+                    for (document in documents) {
+                        val story = document.toObject<UserStoryInfo>()
+                        userStories.add(story)
+                    }
+                    stories.value = userStories.firstOrNull() // Update stories state with the first story or null if no stories exist
+                    refreshStoryProgress.value = false
+                }
+                .addOnFailureListener { exe ->
+                    handleException(exe, "Cannot fetch stories")
+                    refreshStoryProgress.value = false
+                }
+        } else {
+            handleException(customMessage = "Error: username unavailable. Unable to refresh stories")
             onLogout()
         }
     }

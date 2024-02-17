@@ -8,7 +8,9 @@ sealed class DestinationScreen(val route:String){
 
     object Login: DestinationScreen("login")
 
-    object Feed: DestinationScreen("feed")
+    object Feed: DestinationScreen("feed/{isUserStory}") {
+        fun createRoute(isUserStory: Boolean) = "feed/$isUserStory"
+    }
 
     object Search: DestinationScreen("search")
 
@@ -31,12 +33,8 @@ sealed class DestinationScreen(val route:String){
             return "viewstory/$formattedListOfImage"
         }
     }
-    object ViewUserStory: DestinationScreen("viewuserstory/{imageUri}") {
-        fun createRoute(uri: Uri): String {
-            val encodedUri = Uri.encode(uri.toString())
-            return "viewuserstory/$encodedUri"
-        }
-    }
+    object ViewUserStory: DestinationScreen("viewuserstory")
+
     object FollowList: DestinationScreen("followers/{isFollowing}") {
         fun createRoute(isFollowing: Boolean) = "followers/$isFollowing"
     }

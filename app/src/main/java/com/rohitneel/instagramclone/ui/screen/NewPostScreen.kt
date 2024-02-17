@@ -75,14 +75,15 @@ fun NewPostScreen(
                 contentDescription = "back",
                 modifier = Modifier.clickable {
                     if (isMyPostScreen || isUserStory) {
-                        navController.navigate(DestinationScreen.Feed.route)
+                        val route = DestinationScreen.Feed.createRoute(isUserStory = false)
+                        navController.navigate(route)
                     } else {
                         navController.popBackStack()
                     }
                 }
             )
             Text(
-                text = if (isUserStory) "New Story" else "New post",
+                text = if (isUserStory) "New story" else "New post",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(start = 16.dp)
@@ -125,8 +126,9 @@ fun NewPostScreen(
                 onClick = {
                     focusManager.clearFocus()
                     if (isUserStory) {
-                        val route = DestinationScreen.ViewUserStory.createRoute(uri = Uri.parse(encodedUri))
-                        navController.navigate(route)
+                        viewModel.onNewStory(Uri.parse(encodedUri)) {
+                            navController.navigate(DestinationScreen.ViewUserStory.route)
+                        }
                     } else {
                         viewModel.onNewPost(Uri.parse(imageUri), description) {
                             navController.navigate(DestinationScreen.MyPosts.route)

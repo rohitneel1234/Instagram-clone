@@ -47,8 +47,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalCoilApi::class)
 @Composable
-fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel, imageUri: String) {
-    val listOfImage = fetchImages(imageUri)
+fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel) {
+    val stories = viewModel.stories.value
+    val listOfImage = fetchImages(stories?.story.toString())
     val pagerState = rememberPagerState(pageCount = { listOfImage.size })
     val coroutineScope = rememberCoroutineScope()
     var currentPage by remember { mutableStateOf(0) }
@@ -57,7 +58,7 @@ fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel, i
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(state = pagerState) {
             Image(
-                painter = rememberImagePainter(imageUri),
+                painter = rememberImagePainter(stories?.story),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -110,7 +111,8 @@ fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel, i
                             pagerState.animateScrollToPage(currentPage)
                         }
                         if (currentPage == listOfImage.size) {
-                            navController.navigate(DestinationScreen.Feed.route)
+                            val route = DestinationScreen.Feed.createRoute(isUserStory = true)
+                            navController.navigate(route)
                         }
                     }
                 }

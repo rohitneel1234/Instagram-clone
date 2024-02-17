@@ -40,8 +40,16 @@ fun AppNavHost(
         composable(DestinationScreen.Login.route) {
             LoginScreen(navController = navController, viewModel = viewModel)
         }
-        composable(DestinationScreen.Feed.route) {
-            FeedScreen(navController = navController, viewModel = viewModel)
+        composable(
+            DestinationScreen.Feed.route,
+            arguments = listOf(
+                navArgument("isUserStory") {
+                    type = NavType.BoolType
+                }
+            )
+        ) {
+            val isUserStory = it.arguments?.getBoolean("isUserStory") ?: false
+            FeedScreen(navController = navController, viewModel = viewModel, isUserStory = isUserStory)
         }
         composable(DestinationScreen.Search.route) {
             SearchScreen(navController = navController, viewModel = viewModel)
@@ -105,18 +113,8 @@ fun AppNavHost(
             val listOfImages = navBackStackEntry.arguments?.getString("listOfImage") ?: ""
             ViewStory(navController = navController, jsonString = listOfImages)
         }
-        composable(
-            DestinationScreen.ViewUserStory.route,
-            arguments = listOf(
-                navArgument("imageUri") {
-                    type = NavType.StringType
-                }
-            )
-        ) { navBackStackEntry ->
-            val imageUri = navBackStackEntry.arguments?.getString("imageUri")
-            imageUri?.let {
-                ViewUserStory(navController = navController, viewModel = viewModel, imageUri = it)
-            }
+        composable(DestinationScreen.ViewUserStory.route) {
+            ViewUserStory(navController = navController, viewModel = viewModel)
         }
         composable(
             DestinationScreen.FollowList.route,

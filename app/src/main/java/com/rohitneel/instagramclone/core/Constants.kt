@@ -26,6 +26,7 @@ class Constants {
         const val POSTS_COLLECTION = "posts"
         const val USERS_COLLECTION = "users"
         const val COMMENTS_COLLECTION = "comments"
+        const val STORIES_COLLECTION = "story"
 
         // Error Messages
         const val ERROR_EMAIL = "Please write correct email!"
