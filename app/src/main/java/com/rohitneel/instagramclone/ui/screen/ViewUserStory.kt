@@ -39,7 +39,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
+import com.rohitneel.instagramclone.common.StoryPostProgressSpinner
 import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import kotlinx.coroutines.delay
@@ -54,11 +56,13 @@ fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel) {
     val coroutineScope = rememberCoroutineScope()
     var currentPage by remember { mutableStateOf(0) }
     val userData = viewModel.userData.value
+    val painter = rememberImagePainter(stories?.story)
+    val isImageLoaded = painter.state is ImagePainter.State.Success
 
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(state = pagerState) {
             Image(
-                painter = rememberImagePainter(stories?.story),
+                painter = painter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -99,24 +103,26 @@ fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Spacer(modifier = Modifier.padding(4.dp))
-
-            for (index in listOfImage.indices) {
-                StoryLinearIndicator(
-                    modifier = Modifier.weight(1f),
-                    startProgress = index == currentPage
-                ) {
-                    coroutineScope.launch {
-                        currentPage++
-                        if (currentPage < listOfImage.size) {
-                            pagerState.animateScrollToPage(currentPage)
-                        }
-                        if (currentPage == listOfImage.size) {
-                            val route = DestinationScreen.Feed.createRoute(isUserStory = true)
-                            navController.navigate(route)
+            if (!isImageLoaded) {
+                StoryPostProgressSpinner()
+            } else {
+                for (index in listOfImage.indices) {
+                    StoryLinearIndicator(
+                        modifier = Modifier.weight(1f),
+                        startProgress = index == currentPage
+                    ) {
+                        coroutineScope.launch {
+                            currentPage++
+                            if (currentPage < listOfImage.size) {
+                                pagerState.animateScrollToPage(currentPage)
+                            }
+                            if (currentPage == listOfImage.size) {
+                                navController.navigate(DestinationScreen.Feed.route)
+                            }
                         }
                     }
+                    Spacer(modifier = Modifier.padding(4.dp))
                 }
-                Spacer(modifier = Modifier.padding(4.dp))
             }
         }
     }

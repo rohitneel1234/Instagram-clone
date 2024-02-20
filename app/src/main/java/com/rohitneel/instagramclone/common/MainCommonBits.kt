@@ -97,6 +97,27 @@ fun CommonProgressSpinner() {
     }
 }
 
+@Composable
+fun StoryPostProgressSpinner() {
+    Row(
+        modifier = Modifier
+            .alpha(0.5f)
+            .background(Color.LightGray)
+            .clickable(enabled = false) { }
+            .fillMaxSize(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CircularProgressIndicator(modifier = Modifier.size(30.dp))
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "Posting...")
+        }
+    }
+}
+
 data class NavParams(
     val name: String,
     val value: Parcelable
@@ -122,8 +143,7 @@ fun CheckSignedIn(navController: NavController, viewModel: InstagramViewModel) {
     val signedIn = viewModel.signedIn.value
     if (signedIn && !alreadyLoggedIn.value) {
         alreadyLoggedIn.value = true
-        val route = DestinationScreen.Feed.createRoute(isUserStory = false)
-        navController.navigate(route) {
+        navController.navigate(DestinationScreen.Feed.route) {
             popUpTo(0)
         }
     }
@@ -217,24 +237,27 @@ fun LikeAnimation(like: Boolean = true) {
 fun ShowPostActionIcons(
     viewModel: InstagramViewModel,
     post: PostData,
-    numberOfComments: Int
+    numberOfComments: Int,
+    likeCount: MutableState<Int>,
+    isFavorite: MutableState<Boolean>
 ) {
     val isCommentBottomSheetOpened = remember { mutableStateOf(false) }
+    var likeCountValue by remember { likeCount }
+    var isBookmarked by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier.padding(start = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        var isFavorite by remember { mutableStateOf(false) }
-        var isBookmarked by remember { mutableStateOf(false) }
         ToggleIconButton(
             enableTint = Color.Red,
             enableIcon = rememberVectorPainter(image = Icons.Filled.Favorite),
             disableIcon = rememberVectorPainter(image = Icons.Filled.FavoriteBorder),
-            initialState = isFavorite
+            initialState = isFavorite.value
         ) {
-            isFavorite = !isFavorite
-            viewModel.onLikePost(post)
+            isFavorite.value = !isFavorite.value
+            viewModel.onLikePost(post, isFavorite.value)
+            likeCountValue += if (isFavorite.value) 1 else -1
         }
         IconButton(
             onClick = {
@@ -273,7 +296,7 @@ fun ShowPostActionIcons(
         }
     }
     Text(
-        text = "${post.likes?.size ?: 0} likes",
+        text = if (likeCountValue == -1) "0 likes" else "$likeCountValue likes",
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 16.dp)
     )

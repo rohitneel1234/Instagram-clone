@@ -83,13 +83,14 @@ import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(navController: NavController, viewModel: InstagramViewModel, isUserStory: Boolean) {
+fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
 
     val userDataLoading = viewModel.inProgress.value
     val userData = viewModel.userData.value
     val personalizedFeed = viewModel.postFeed.value
     val personalizedFeedLoading = viewModel.postFeedProgress.value
     var isAddToStory by remember { mutableStateOf(false) }
+    val isStoryVisible = viewModel.isStoryVisible.value
 
     Column(
         modifier = Modifier
@@ -143,14 +144,14 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel, isUs
                 Box(
                     modifier = Modifier
                         .clickable {
-                            if (isUserStory) {
+                            if (isStoryVisible) {
                                 navController.navigate(DestinationScreen.ViewUserStory.route)
                             } else {
                                 isAddToStory = true
                             }
                         }
                 ) {
-                    if (isUserStory) {
+                    if (isStoryVisible) {
                         UserStoryImageCard(userImage = userData?.imageUrl)
                     } else {
                         UserImageCard(userImage = userData?.imageUrl)
@@ -358,6 +359,8 @@ fun Post(
     val isBottomSheetOpened = remember { mutableStateOf(false) }
     val userData = viewModel.userData.value
     val comments = viewModel.comments.value
+    val likeCount = remember { mutableStateOf(post.likes?.size ?: 0) }
+    val isFavorite = remember { mutableStateOf(post.isLiked) }
 
     ShowMoreOptionsBottomSheet(
         isBottomSheetOpened = isBottomSheetOpened,
@@ -435,10 +438,14 @@ fun Post(
                         onDoubleTap = {
                             if (post.likes?.contains(currentUserId) == true) {
                                 dislikeAnimation.value = true
+                                isFavorite.value = false
+                                viewModel.onLikePost(post, false)
                             } else {
                                 likeAnimation.value = true
+                                isFavorite.value = true
+                                viewModel.onLikePost(post, true)
                             }
-                            viewModel.onLikePost(post)
+                            likeCount.value += if (post.likes?.contains(currentUserId) == true) -1 else 1
                         }
                     )
                 }
@@ -453,20 +460,22 @@ fun Post(
                     delay(1000L)
                     likeAnimation.value = false
                 }
-                LikeAnimation()
+                LikeAnimation(true)
             }
             if (dislikeAnimation.value) {
                 CoroutineScope(Dispatchers.Main).launch {
                     delay(1000L)
                     dislikeAnimation.value = false
                 }
-                LikeAnimation()
+                LikeAnimation(false)
             }
         }
         ShowPostActionIcons(
             viewModel = viewModel,
             post = post,
-            numberOfComments = comments.size
+            numberOfComments = comments.size,
+            likeCount = likeCount,
+            isFavorite = isFavorite
         )
     }
 }

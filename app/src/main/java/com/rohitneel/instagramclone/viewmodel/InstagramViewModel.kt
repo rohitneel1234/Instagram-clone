@@ -37,7 +37,7 @@ class InstagramViewModel @Inject constructor(
     val popupNotification = mutableStateOf<Event<String>?>(null)
 
     val refreshPostsProgress = mutableStateOf(false)
-    val refreshStoryProgress = mutableStateOf(false)
+    var isStoryVisible = mutableStateOf(false)
     val posts = mutableStateOf<List<PostData>>(listOf())
     val stories = mutableStateOf<UserStoryInfo?>(null)
     val searchedPost = mutableStateOf<List<PostData>>(listOf())
@@ -272,6 +272,7 @@ class InstagramViewModel @Inject constructor(
     }
 
     fun onNewStory(uri: Uri, onPostSuccess: () -> Unit) {
+        onPostSuccess.invoke()
         uploadStory(uri) {
             onCreateStory(it, onPostSuccess)
         }
@@ -332,10 +333,9 @@ class InstagramViewModel @Inject constructor(
             )
             database.collection(STORIES_COLLECTION).document(storyUuid).set(story)
                 .addOnSuccessListener {
-                    popupNotification.value = Event("Story created")
                     inProgress.value = false
                     getStoryData()
-                    onPostSuccess.invoke()
+                    isStoryVisible.value = true
                 }
                 .addOnFailureListener { exe ->
                     handleException(exe, "Unable to create story")
@@ -370,7 +370,6 @@ class InstagramViewModel @Inject constructor(
     private fun getStoryData() {
         val currentUid = auth.currentUser?.uid
         if (currentUid != null) {
-            refreshStoryProgress.value = true
             database.collection(STORIES_COLLECTION).whereEqualTo("userId", currentUid)
                 .limit(1)
                 .get()    // Limit the result to only 1 document (the most recent one).get()
@@ -381,11 +380,9 @@ class InstagramViewModel @Inject constructor(
                         userStories.add(story)
                     }
                     stories.value = userStories.firstOrNull() // Update stories state with the first story or null if no stories exist
-                    refreshStoryProgress.value = false
                 }
                 .addOnFailureListener { exe ->
                     handleException(exe, "Cannot fetch stories")
-                    refreshStoryProgress.value = false
                 }
         } else {
             handleException(customMessage = "Error: username unavailable. Unable to refresh stories")
@@ -477,21 +474,29 @@ class InstagramViewModel @Inject constructor(
             }
     }
 
-    fun onLikePost(postData: PostData) {
+    fun onLikePost(postData: PostData, isLiked: Boolean) {
         auth.currentUser?.uid?.let { userId ->
             postData.likes?.let { likes ->
-                val newLikes = arrayListOf<String>()
-                if (likes.contains(userId)) {
-                    newLikes.addAll(likes.filter { userId != it })
+                val newLikes = ArrayList<String>(likes)
+                val hasLiked = likes.contains(userId)
+                if (isLiked) {
+                    if (!hasLiked) {
+                        newLikes.add(userId)
+                    }
+                    postData.isLiked = true
                 } else {
-                    newLikes.addAll(likes)
-                    newLikes.add(userId)
+                    if (hasLiked) {
+                        newLikes.remove(userId)
+                    }
+                    postData.isLiked = false
                 }
                 postData.postId?.let { postId ->
-                    database.collection(POSTS_COLLECTION).document(postId).update("likes", newLikes)
+                    database.collection(POSTS_COLLECTION).document(postId).update(mapOf("likes" to newLikes, "isLiked" to postData.isLiked))
                         .addOnSuccessListener {
                             postData.likes = newLikes
-                            getLikedPosts()
+                            if (hasLiked) {
+                                getLikedPosts()
+                            }
                         }
                         .addOnFailureListener {
                             handleException(it, "Unable to like post")

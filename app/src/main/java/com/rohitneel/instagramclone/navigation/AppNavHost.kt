@@ -40,16 +40,8 @@ fun AppNavHost(
         composable(DestinationScreen.Login.route) {
             LoginScreen(navController = navController, viewModel = viewModel)
         }
-        composable(
-            DestinationScreen.Feed.route,
-            arguments = listOf(
-                navArgument("isUserStory") {
-                    type = NavType.BoolType
-                }
-            )
-        ) {
-            val isUserStory = it.arguments?.getBoolean("isUserStory") ?: false
-            FeedScreen(navController = navController, viewModel = viewModel, isUserStory = isUserStory)
+        composable(DestinationScreen.Feed.route) {
+            FeedScreen(navController = navController, viewModel = viewModel)
         }
         composable(DestinationScreen.Search.route) {
             SearchScreen(navController = navController, viewModel = viewModel)

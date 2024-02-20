@@ -8,9 +8,7 @@ sealed class DestinationScreen(val route:String){
 
     object Login: DestinationScreen("login")
 
-    object Feed: DestinationScreen("feed/{isUserStory}") {
-        fun createRoute(isUserStory: Boolean) = "feed/$isUserStory"
-    }
+    object Feed: DestinationScreen("feed")
 
     object Search: DestinationScreen("search")
 

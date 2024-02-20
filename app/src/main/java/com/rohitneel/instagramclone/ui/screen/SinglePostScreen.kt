@@ -115,6 +115,8 @@ fun SinglePostDisplay(
 ) {
     val userData = viewModel.userData.value
     val isBottomSheetOpened = remember { mutableStateOf(false) }
+    val likeCount = remember { mutableStateOf(post.likes?.size ?: 0) }
+    var isFavorite = remember { mutableStateOf(post.isLiked) }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getComments(post.postId)
@@ -180,7 +182,9 @@ fun SinglePostDisplay(
         ShowPostActionIcons(
             viewModel = viewModel,
             post = post,
-            numberOfComments = numberOfComments
+            numberOfComments = numberOfComments,
+            likeCount = likeCount,
+            isFavorite = isFavorite
         )
     }
 }

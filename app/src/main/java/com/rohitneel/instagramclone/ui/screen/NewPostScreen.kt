@@ -75,8 +75,7 @@ fun NewPostScreen(
                 contentDescription = "back",
                 modifier = Modifier.clickable {
                     if (isMyPostScreen || isUserStory) {
-                        val route = DestinationScreen.Feed.createRoute(isUserStory = false)
-                        navController.navigate(route)
+                        navController.navigate(DestinationScreen.Feed.route)
                     } else {
                         navController.popBackStack()
                     }
