@@ -28,6 +28,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +75,11 @@ fun ShowCommentScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val userImage = viewModel.userData.value?.imageUrl
     val userId = viewModel.userData.value?.userId
+
+    DisposableEffect(postId) {
+        viewModel.getComments(postId)
+        onDispose { }
+    }
 
     ModalBottomSheet(
         sheetState = bottomSheet,

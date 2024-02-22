@@ -362,6 +362,10 @@ fun Post(
     val likeCount = remember { mutableStateOf(post.likes?.size ?: 0) }
     val isFavorite = remember { mutableStateOf(post.isLiked) }
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getComments(post.postId)
+    }
+
     ShowMoreOptionsBottomSheet(
         isBottomSheetOpened = isBottomSheetOpened,
         navController = navController,
