@@ -28,9 +28,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InstagramViewModel @Inject constructor(
-    val auth: FirebaseAuth,
-    val database: FirebaseFirestore,
-    val storage: FirebaseStorage
+    private val auth: FirebaseAuth,
+    private val database: FirebaseFirestore,
+    private val storage: FirebaseStorage
 ) : ViewModel() {
 
     val signedIn = mutableStateOf(false)
