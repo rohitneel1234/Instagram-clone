@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -132,6 +133,7 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
                    )
                 }
                 Text(text = post.userName ?: "", fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.width(24.dp))
 
                 if (userData?.userId == post.userId) {
                     Spacer(modifier = Modifier.weight(1f))

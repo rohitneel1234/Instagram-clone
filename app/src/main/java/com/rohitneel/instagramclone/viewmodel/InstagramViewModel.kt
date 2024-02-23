@@ -293,6 +293,8 @@ class InstagramViewModel @Inject constructor(
             val searchTerms = description.split(" ", ".", ",", "?", "!", "#")
                 .map { it.lowercase() }
                 .filter { it.isNotEmpty() and !fillerWords.contains(it) }
+                .flatMap { term -> listOf(term, currentUsername.toString()) }
+                .distinct()
             val post = PostData(
                 postId = postUuid,
                 userId = currentUid,
