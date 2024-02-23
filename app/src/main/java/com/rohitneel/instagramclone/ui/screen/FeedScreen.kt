@@ -114,7 +114,7 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
             actions = {
                 Row {
                     IconButton(onClick = {
-                        //navController.navigate(NavigationItem.Notification.route)
+                        navController.navigate(DestinationScreen.Notifications.route)
                     }) {
                         Icon(
                             painterResource(id = R.drawable.ic_notifications),
