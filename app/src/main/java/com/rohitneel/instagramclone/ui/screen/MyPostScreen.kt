@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -99,6 +100,10 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null
+                    )
                 }
             },
             colors = TopAppBarColors(
@@ -119,7 +124,10 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
             }
         )
         Column(modifier = Modifier.weight(1f)) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            ) {
                 ProfileImage(userData?.imageUrl) {
                     newPostImageLauncher.launch("image/*")
                 }
@@ -206,12 +214,11 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
 @Composable
 fun ProfileImage(imageUrl: String?, onClick: () -> Unit) {
     Box(modifier = Modifier
-        .padding(top = 16.dp)
         .clickable { onClick.invoke() }
     ) {
         UserImageCard(
             userImage = imageUrl, modifier = Modifier
-                .padding(8.dp)
+                .padding(horizontal = 8.dp)
                 .size(80.dp)
         )
         Card(
