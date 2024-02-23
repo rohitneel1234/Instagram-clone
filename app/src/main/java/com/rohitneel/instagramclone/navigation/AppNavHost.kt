@@ -18,6 +18,7 @@ import com.rohitneel.instagramclone.ui.screen.MyPostScreen
 import com.rohitneel.instagramclone.ui.screen.NewPostScreen
 import com.rohitneel.instagramclone.ui.screen.NotificationsScreen
 import com.rohitneel.instagramclone.ui.screen.SearchScreen
+import com.rohitneel.instagramclone.ui.screen.SearchedPostScreen
 import com.rohitneel.instagramclone.ui.screen.SinglePostScreen
 import com.rohitneel.instagramclone.ui.screen.UserFollowerListScreen
 import com.rohitneel.instagramclone.ui.screen.ViewStory
@@ -79,6 +80,19 @@ fun AppNavHost(
                 ?.getParcelable<PostData>("post")
             postData?.let {
                 SinglePostScreen(
+                    navController = navController,
+                    viewModel = viewModel,
+                    post = postData
+                )
+            }
+        }
+        composable(DestinationScreen.SearchPost.route) {
+            val postData = navController
+                .previousBackStackEntry
+                ?.arguments
+                ?.getParcelable<PostData>("post")
+            postData?.let {
+                SearchedPostScreen(
                     navController = navController,
                     viewModel = viewModel,
                     post = postData

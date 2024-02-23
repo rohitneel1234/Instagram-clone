@@ -89,7 +89,7 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
         ) { post ->
             navigateTo(
                 navController = navController,
-                destinationScreen = DestinationScreen.Feed,
+                destinationScreen = DestinationScreen.SearchPost,
                 NavParams("post", post)
             )
         }
