@@ -1,7 +1,10 @@
 package com.rohitneel.instagramclone.common
 
+import android.content.Intent
 import android.os.Parcelable
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
@@ -244,6 +247,9 @@ fun ShowPostActionIcons(
     val isCommentBottomSheetOpened = remember { mutableStateOf(false) }
     var likeCountValue by remember { likeCount }
     var isBookmarked by remember { mutableStateOf(false) }
+    val shareContent: String = ("Check out this post: " + post.postImage)
+    val shareLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
+
     Row(
         modifier = Modifier.padding(start = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -274,7 +280,15 @@ fun ShowPostActionIcons(
             )
         }
         IconButton(
-            onClick = { }
+            onClick = {
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, shareContent)
+                    type = "text/plain"
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                shareLauncher.launch(Intent.createChooser(sendIntent, "Sharing post"))
+            }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_share),
