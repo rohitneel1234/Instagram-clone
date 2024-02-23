@@ -39,18 +39,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
-import com.rohitneel.instagramclone.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import java.lang.Exception
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ViewStory(navController: NavController, jsonString: String) {
+fun ViewStory(navController: NavController, jsonString: String, userName: String, profile: Int) {
     val listOfImage: List<Int> = if (jsonString.isEmpty()) emptyList() else {
         try {
             Json.decodeFromString(jsonString)
@@ -84,14 +80,14 @@ fun ViewStory(navController: NavController, jsonString: String) {
                     .size(32.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_instagram_logo),
+                    painter = painterResource(id = profile),
                     contentDescription = null,
                     modifier = Modifier.wrapContentSize(),
                     contentScale = ContentScale.Crop
                 )
             }
             Text(
-                text = "Instagram",
+                text = userName,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 modifier = Modifier.padding(4.dp)

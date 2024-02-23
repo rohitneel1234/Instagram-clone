@@ -264,7 +264,7 @@ fun StoriesSection(storyList: List<Stories>, navController: NavController) {
 
 fun getStories(): List<Stories> = listOf(
     Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
+    Stories(userName = "mountain", profile = R.drawable.mountains_image),
     Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
     Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo)
 )
@@ -292,9 +292,13 @@ fun StoryItem(story: Stories, navController: NavController) {
                 .padding(5.dp)
                 .clip(CircleShape)
                 .clickable {
-                    val listOfImage = listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
+                    val listOfImage = when (story.userName) {
+                        "instagram" -> listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
+                        "mountain" -> listOf(R.drawable.mountains_image)
+                        else -> emptyList()
+                    }
                     val jsonString = Json.encodeToString(listOfImage)
-                    val route = DestinationScreen.ViewStory.createRoute(jsonString)
+                    val route = DestinationScreen.ViewStory.createRoute(jsonString, story.userName, story.profile)
                     navController.navigate(route)
                 },
             contentScale = ContentScale.Crop

@@ -1,7 +1,5 @@
 package com.rohitneel.instagramclone.navigation
 
-import android.net.Uri
-
 sealed class DestinationScreen(val route:String){
 
     object Signup: DestinationScreen("signup")
@@ -28,10 +26,11 @@ sealed class DestinationScreen(val route:String){
 
     object Notifications: DestinationScreen("notifications")
 
-    object ViewStory: DestinationScreen("viewstory/{listOfImage}") {
-        fun createRoute(listOfImage: String? = ""): String {
+    object ViewStory: DestinationScreen("viewstory/{listOfImage}/{userName}/{profile}") {
+        fun createRoute(listOfImage: String? = "", userName: String? = "", profile: Int): String {
             val formattedListOfImage = listOfImage ?: "listOfImage"
-            return "viewstory/$formattedListOfImage"
+            val storyUserName = userName ?: ""
+            return "viewstory/$formattedListOfImage/$storyUserName/$profile"
         }
     }
     object ViewUserStory: DestinationScreen("viewuserstory")

@@ -113,11 +113,19 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument("listOfImage") {
                     type = NavType.StringType
+                },
+                navArgument("userName") {
+                    type = NavType.StringType
+                },
+                navArgument("profile") {
+                    type = NavType.IntType
                 }
             )
         ) { navBackStackEntry ->
             val listOfImages = navBackStackEntry.arguments?.getString("listOfImage") ?: ""
-            ViewStory(navController = navController, jsonString = listOfImages)
+            val userName = navBackStackEntry.arguments?.getString("userName") ?: ""
+            val profile = navBackStackEntry.arguments?.getInt("profile")
+            profile?.let { ViewStory(navController = navController, jsonString = listOfImages, userName = userName, profile = it) }
         }
         composable(DestinationScreen.ViewUserStory.route) {
             ViewUserStory(navController = navController, viewModel = viewModel)
