@@ -3,12 +3,6 @@ package com.rohitneel.instagramclone.core
 class Constants {
 
     companion object {
-        // Screens & Titles
-        const val LOGIN_SCREEN = "Log-In"
-        const val HOME_SCREEN = "Home"
-        const val LOGIN_TITLE = "Profile"
-        const val HOME_TITLE = "Home"
-
         // Login Screen
         // Placeholders
         const val EMAIL_PLACEHOLDER = "Email"
