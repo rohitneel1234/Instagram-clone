@@ -36,5 +36,8 @@ class Constants {
 
         // Storage
         const val IMAGES_PATH = "images/"
+
+        // Time
+        const val TIME_IN_MINUTE = 10
     }
 }

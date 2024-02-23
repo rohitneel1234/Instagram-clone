@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,6 +14,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.rohitneel.instagramclone.core.Constants.Companion.COMMENTS_COLLECTION
 import com.rohitneel.instagramclone.core.Constants.Companion.POSTS_COLLECTION
 import com.rohitneel.instagramclone.core.Constants.Companion.STORIES_COLLECTION
+import com.rohitneel.instagramclone.core.Constants.Companion.TIME_IN_MINUTE
 import com.rohitneel.instagramclone.core.Constants.Companion.USERS_COLLECTION
 import com.rohitneel.instagramclone.models.CommentData
 import com.rohitneel.instagramclone.models.Event
@@ -329,7 +331,8 @@ class InstagramViewModel @Inject constructor(
             val story = UserStoryInfo(
                 storyId = storyUuid,
                 userId = currentUid,
-                story = imageUri.toString()
+                story = imageUri.toString(),
+                timestamp = Timestamp.now()
             )
             database.collection(STORIES_COLLECTION).document(storyUuid).set(story)
                 .addOnSuccessListener {
@@ -370,15 +373,19 @@ class InstagramViewModel @Inject constructor(
     private fun getStoryData() {
         val currentUid = auth.currentUser?.uid
         if (currentUid != null) {
-            database.collection(STORIES_COLLECTION).whereEqualTo("userId", currentUid)
-                .limit(1)
-                .get()    // Limit the result to only 1 document (the most recent one).get()
+            database.collection(STORIES_COLLECTION).whereEqualTo("userId", currentUid).get()
                 .addOnSuccessListener { documents ->
+                    val currentTime = Timestamp.now()
                     val userStories = mutableListOf<UserStoryInfo>()
                     for (document in documents) {
                         val story = document.toObject<UserStoryInfo>()
-                        userStories.add(story)
+                        if (currentTime.seconds - story.timestamp.seconds <= TIME_IN_MINUTE * 60) {
+                            userStories.add(story)
+                        } else {
+                            story.storyId?.let { database.collection(STORIES_COLLECTION).document(it).delete() } // Delete old story
+                        }
                     }
+                    userStories.sortByDescending { it.timestamp }
                     stories.value = userStories.firstOrNull() // Update stories state with the first story or null if no stories exist
                 }
                 .addOnFailureListener { exe ->
