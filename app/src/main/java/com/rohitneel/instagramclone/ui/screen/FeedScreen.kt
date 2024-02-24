@@ -264,9 +264,9 @@ fun StoriesSection(storyList: List<Stories>, navController: NavController) {
 
 fun getStories(): List<Stories> = listOf(
     Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
-    Stories(userName = "mountain", profile = R.drawable.mountains_image),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo)
+    Stories(userName = "nature", profile = R.drawable.nature),
+    Stories(userName = "avengers", profile = R.drawable.avengers),
+    Stories(userName = "flower", profile = R.drawable.flower)
 )
 
 @Composable
@@ -294,7 +294,9 @@ fun StoryItem(story: Stories, navController: NavController) {
                 .clickable {
                     val listOfImage = when (story.userName) {
                         "instagram" -> listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
-                        "mountain" -> listOf(R.drawable.mountains_image)
+                        "nature" -> listOf(R.drawable.nature)
+                        "avengers" -> listOf(R.drawable.avengers)
+                        "flower" -> listOf(R.drawable.flower)
                         else -> emptyList()
                     }
                     val jsonString = Json.encodeToString(listOfImage)
