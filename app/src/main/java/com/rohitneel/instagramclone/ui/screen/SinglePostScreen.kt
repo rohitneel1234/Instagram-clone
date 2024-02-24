@@ -113,10 +113,11 @@ fun SinglePostDisplay(
     post: PostData,
     numberOfComments: Int
 ) {
-    val userData = viewModel.userData.value
     val isBottomSheetOpened = remember { mutableStateOf(false) }
     val likeCount = remember { mutableStateOf(post.likes?.size ?: 0) }
-    var isFavorite = remember { mutableStateOf(post.isLiked) }
+    val isFavorite = remember { mutableStateOf(post.isLiked) }
+    val isLikeCountVisible = remember { mutableStateOf(true) }
+    val isCommentOptionVisible = remember { mutableStateOf(true) }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getComments(post.postId)
@@ -126,7 +127,9 @@ fun SinglePostDisplay(
         isBottomSheetOpened = isBottomSheetOpened,
         navController = navController,
         viewModel = viewModel,
-        post = post
+        post = post,
+        isLikeCountVisible = isLikeCountVisible,
+        isCommentOptionVisible = isCommentOptionVisible
     )
     Column(
         modifier = Modifier
@@ -184,7 +187,9 @@ fun SinglePostDisplay(
             post = post,
             numberOfComments = numberOfComments,
             likeCount = likeCount,
-            isFavorite = isFavorite
+            isFavorite = isFavorite,
+            isLikeCountVisible = isLikeCountVisible,
+            isCommentOptionVisible = isCommentOptionVisible
         )
     }
 }

@@ -242,7 +242,9 @@ fun ShowPostActionIcons(
     post: PostData,
     numberOfComments: Int,
     likeCount: MutableState<Int>,
-    isFavorite: MutableState<Boolean>
+    isFavorite: MutableState<Boolean>,
+    isLikeCountVisible: MutableState<Boolean>,
+    isCommentOptionVisible: MutableState<Boolean>
 ) {
     val isCommentBottomSheetOpened = remember { mutableStateOf(false) }
     var likeCountValue by remember { likeCount }
@@ -265,19 +267,21 @@ fun ShowPostActionIcons(
             viewModel.onLikePost(post, isFavorite.value)
             likeCountValue += if (isFavorite.value) 1 else -1
         }
-        IconButton(
-            onClick = {
-                post.postId?.let {
-                    isCommentBottomSheetOpened.value = true
+        if (isCommentOptionVisible.value) {
+            IconButton(
+                onClick = {
+                    post.postId?.let {
+                        isCommentBottomSheetOpened.value = true
+                    }
                 }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_comment),
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_comment),
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
         }
         IconButton(
             onClick = {
@@ -309,11 +313,13 @@ fun ShowPostActionIcons(
             isBookmarked = !isBookmarked
         }
     }
-    Text(
-        text = if (likeCountValue == -1) "0 likes" else "$likeCountValue likes",
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 16.dp)
-    )
+    if (isLikeCountVisible.value) {
+        Text(
+            text = if (likeCountValue == -1) "0 likes" else "$likeCountValue likes",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+    }
 
     Row(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp)) {
         Text(text = post.userName ?: "", fontWeight = FontWeight.Bold)
@@ -322,7 +328,7 @@ fun ShowPostActionIcons(
 
     Row {
         Text(
-            text = "View $numberOfComments comments",
+            text = if (isCommentOptionVisible.value) "View $numberOfComments comments" else "Comments are off.",
             color = Color.DarkGray,
             fontSize = 14.sp,
             modifier = Modifier
@@ -334,7 +340,7 @@ fun ShowPostActionIcons(
                 }
         )
     }
-    if (isCommentBottomSheetOpened.value) {
+    if (isCommentBottomSheetOpened.value && isCommentOptionVisible.value) {
         post.postId?.let {
             ShowCommentScreen(
                 isCommentBottomSheetOpened = isCommentBottomSheetOpened,
@@ -352,10 +358,13 @@ fun ShowMoreOptionsBottomSheet(
     isBottomSheetOpened: MutableState<Boolean>,
     navController: NavController,
     viewModel: InstagramViewModel,
-    post: PostData
+    post: PostData,
+    isLikeCountVisible: MutableState<Boolean>,
+    isCommentOptionVisible: MutableState<Boolean>
 ) {
     val bottomSheet = rememberModalBottomSheetState()
     var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (isBottomSheetOpened.value) {
         ModalBottomSheet(
@@ -389,17 +398,25 @@ fun ShowMoreOptionsBottomSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { },
+                        .clickable {
+                            isLikeCountVisible.value = !isLikeCountVisible.value
+                            isBottomSheetOpened.value = false
+                            if (isLikeCountVisible.value) {
+                                Toast.makeText(context, "Like count unhidden", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "Like count hidden", Toast.LENGTH_SHORT).show()
+                            }
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_like_disabled),
+                        painter = painterResource(id = if (isLikeCountVisible.value) R.drawable.ic_like_disabled else R.drawable.ic_dislike),
                         contentDescription = null,
                         tint = Color.Black
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Hide like count",
+                        text = if (isLikeCountVisible.value) "Hide like count" else "Unhide like count",
                         style = TextStyle(
                             fontFamily = FontFamily.Serif,
                             color = Color.Black,
@@ -412,17 +429,20 @@ fun ShowMoreOptionsBottomSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { },
+                        .clickable {
+                            isCommentOptionVisible.value = !isCommentOptionVisible.value
+                            isBottomSheetOpened.value = false
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_comment_disabled),
+                        painter = painterResource(id = if (isCommentOptionVisible.value) R.drawable.ic_comment_disabled else R.drawable.ic_comment),
                         contentDescription = null,
                         tint = Color.Black
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Turn off commenting",
+                        text = if (isCommentOptionVisible.value) "Turn off commenting" else "Turn on commenting",
                         style = TextStyle(
                             fontFamily = FontFamily.Serif,
                             color = Color.Black,

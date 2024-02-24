@@ -95,6 +95,8 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
     val isBottomSheetOpened = remember { mutableStateOf(false) }
     val likeCount = remember { mutableStateOf(post.likes?.size ?: 0) }
     val isFavorite = remember { mutableStateOf(post.isLiked) }
+    val isLikeCountVisible = remember { mutableStateOf(true) }
+    val isCommentOptionVisible = remember { mutableStateOf(true) }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getComments(post.postId)
@@ -104,7 +106,9 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
         isBottomSheetOpened = isBottomSheetOpened,
         navController = navController,
         viewModel = viewModel,
-        post = post
+        post = post,
+        isLikeCountVisible = isLikeCountVisible,
+        isCommentOptionVisible = isCommentOptionVisible
     )
     Column(
         modifier = Modifier
@@ -181,7 +185,9 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
             post = post,
             numberOfComments = numberOfComments,
             likeCount = likeCount,
-            isFavorite = isFavorite
+            isFavorite = isFavorite,
+            isLikeCountVisible = isLikeCountVisible,
+            isCommentOptionVisible = isCommentOptionVisible
         )
     }
 }
