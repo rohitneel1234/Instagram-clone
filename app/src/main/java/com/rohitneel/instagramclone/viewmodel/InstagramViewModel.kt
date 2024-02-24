@@ -589,12 +589,13 @@ class InstagramViewModel @Inject constructor(
             }
     }
 
-    fun deleteComment(commentId: String) {
+    fun deleteComment(commentId: String, postId: String) {
         val fireStore = FirebaseFirestore.getInstance()
         val postsCollection = fireStore.collection(COMMENTS_COLLECTION)
         postsCollection.document(commentId).delete()
             .addOnSuccessListener {
                 popupNotification.value = Event("Comment deleted")
+                getComments(postId)
             }
             .addOnFailureListener { exception ->
                 handleException(exception, "Unable to delete comment")
