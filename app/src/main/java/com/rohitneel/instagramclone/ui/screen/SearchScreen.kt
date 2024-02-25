@@ -37,6 +37,7 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
     val searchedPosts = viewModel.searchedPost.value
     var searchTerm by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val userData = viewModel.userData.value
 
     Column {
         SearchBar(
@@ -87,11 +88,15 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
                 .fillMaxWidth()
                 .padding(8.dp)
         ) { post ->
-            navigateTo(
-                navController = navController,
-                destinationScreen = DestinationScreen.SearchPost,
-                NavParams("post", post)
-            )
+            if (userData?.userId == post.userId) {
+                navigateTo(navController = navController, destinationScreen = DestinationScreen.MyPosts)
+            } else {
+                navigateTo(
+                    navController = navController,
+                    destinationScreen = DestinationScreen.SearchPost,
+                    NavParams("post", post)
+                )
+            }
         }
     }
 }

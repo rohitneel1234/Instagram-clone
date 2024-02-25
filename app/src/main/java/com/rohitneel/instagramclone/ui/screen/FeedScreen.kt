@@ -33,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
@@ -65,6 +66,7 @@ import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
+import com.rohitneel.instagramclone.common.CustomButton
 import com.rohitneel.instagramclone.common.LikeAnimation
 import com.rohitneel.instagramclone.common.ShowMoreOptionsBottomSheet
 import com.rohitneel.instagramclone.common.ShowPostActionIcons
@@ -408,27 +410,24 @@ fun Post(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(4.dp)
             )
-             if (userData?.following?.contains(post.userId) == true) {
-                Text(
-                    text = "Following",
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .padding(start = 24.dp)
-                        .clickable {
-                            viewModel.onFollowClick(post.userId!!)
-                        })
-            } else if (userData?.userId != post.userId) {
-                Text(
-                    text = "Follow",
-                    color = colorResource(id = R.color.blue),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(start = 24.dp)
-                        .clickable {
-                            viewModel.onFollowClick(post.userId!!)
-                        })
-            }
             Spacer(modifier = Modifier.weight(1f))
+            if (userData?.following?.contains(post.userId) == true) {
+                 CustomButton(
+                     text = "Following",
+                     textColor = MaterialTheme.colorScheme.onBackground,
+                     backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
+                     viewModel = viewModel,
+                     post = post
+                 )
+            } else if (userData?.userId != post.userId) {
+                 CustomButton(
+                     text = "Follow",
+                     textColor = Color.White,
+                     backgroundColor = colorResource(id = R.color.button_background_color),
+                     viewModel = viewModel,
+                     post = post
+                 )
+            }
             IconButton(
                 onClick = {
                     if (userData?.userId == post.userId) {
