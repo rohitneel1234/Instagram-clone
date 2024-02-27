@@ -28,9 +28,6 @@ class Constants {
         const val ERROR_PASSWORD = "Password must be at least 6 digits!"
         const val ALREADY_LOGGED_IN = "You are already logged in!"
 
-        // Storage
-        const val IMAGES_PATH = "images/"
-
         // Time
         const val TIME_IN_MINUTE = 10
     }
