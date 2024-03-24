@@ -70,7 +70,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.models.PostData
@@ -169,7 +169,7 @@ fun CommonImage(
         modifier = modifier,
         contentScale = contentScale
     )
-    if (painter.state is ImagePainter.State.Loading) {
+    if (painter.state is AsyncImagePainter.State.Loading) {
         CommonProgressSpinner()
     }
 }

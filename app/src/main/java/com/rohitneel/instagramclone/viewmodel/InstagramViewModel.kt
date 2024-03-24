@@ -426,6 +426,10 @@ class InstagramViewModel @Inject constructor(
         }
     }
 
+    fun clearSearchedPosts() {
+        searchedPost.value = emptyList()
+    }
+
     fun onFollowClick(userId: String) {
         auth.currentUser?.uid?.let { currentUser ->
             val following = arrayListOf<String>()

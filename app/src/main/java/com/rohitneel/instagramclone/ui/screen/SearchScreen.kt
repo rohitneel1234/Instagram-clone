@@ -13,6 +13,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +39,13 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
     var searchTerm by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val userData = viewModel.userData.value
+
+    // Observe search term changes to clear searched posts when searchTerm is empty
+    LaunchedEffect(searchTerm) {
+        if (searchTerm.isEmpty()) {
+            viewModel.clearSearchedPosts()
+        }
+    }
 
     Column {
         SearchBar(
