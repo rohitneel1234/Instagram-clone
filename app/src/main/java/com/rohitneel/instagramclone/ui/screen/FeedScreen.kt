@@ -61,10 +61,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
+import com.rohitneel.instagramclone.common.CommonProgressIndicator
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
 import com.rohitneel.instagramclone.common.CustomButton
 import com.rohitneel.instagramclone.common.LikeAnimation
@@ -200,7 +200,6 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun UserStoryImageCard(
     userImage: String?,
@@ -217,7 +216,7 @@ fun UserStoryImageCard(
             )
         } else {
             Image(
-                painter = rememberImagePainter(data = userImage),
+                painter = rememberAsyncImagePainter(model = userImage),
                 contentDescription = null,
                 modifier = Modifier
                     .size(60.dp)
@@ -302,7 +301,11 @@ fun StoryItem(story: Stories, navController: NavController) {
                         else -> emptyList()
                     }
                     val jsonString = Json.encodeToString(listOfImage)
-                    val route = DestinationScreen.ViewStory.createRoute(jsonString, story.userName, story.profile)
+                    val route = DestinationScreen.ViewStory.createRoute(
+                        jsonString,
+                        story.userName,
+                        story.profile
+                    )
                     navController.navigate(route)
                 },
             contentScale = ContentScale.Crop
@@ -469,14 +472,14 @@ fun Post(
             )
 
             if (likeAnimation.value) {
-                CoroutineScope(Dispatchers.Main).launch {
+                LaunchedEffect(Unit) {
                     delay(1000L)
                     likeAnimation.value = false
                 }
                 LikeAnimation(true)
             }
             if (dislikeAnimation.value) {
-                CoroutineScope(Dispatchers.Main).launch {
+                LaunchedEffect(Unit) {
                     delay(1000L)
                     dislikeAnimation.value = false
                 }

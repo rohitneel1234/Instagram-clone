@@ -23,13 +23,15 @@ class Constants {
         const val STORIES_COLLECTION = "story"
 
         // Error Messages
-        const val ERROR_EMAIL = "Please write correct email!"
-        const val ERROR_USERNAME = "In username must be at not special characters and not too long!"
-        const val ERROR_PASSWORD = "Password must be at least 6 digits!"
+        const val USER_NAME_ERROR = "Please, input a valid user name!"
+        const val EMAIL_ERROR = "The format of email doesn't seem correct"
+        const val PASSWORD_ERROR = "Please, input capital and non-capital letters, a number, special character and a minimum of 8 digits"
         const val ALREADY_LOGGED_IN = "You are already logged in!"
 
         // Time
         const val TIME_IN_MINUTE = 10
+
+        const val SPLASH_SCREEN_TIME = 3000L
 
         val IMAGE_URLS = listOf(
             "https://cdn.pixabay.com/photo/2023/05/28/03/34/flowers-8022731_1280.jpg",

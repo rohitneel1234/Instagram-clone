@@ -2,16 +2,20 @@ package com.rohitneel.instagramclone.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
-import com.rohitneel.instagramclone.auth.LoginScreen
+import com.rohitneel.instagramclone.auth.AuthenticationScreen
+import com.rohitneel.instagramclone.auth.ForgotPasswordScreen
 import com.rohitneel.instagramclone.auth.ProfileScreen
-import com.rohitneel.instagramclone.auth.SignupScreen
 import com.rohitneel.instagramclone.models.PostData
+import com.rohitneel.instagramclone.onboarding.Onboarding
 import com.rohitneel.instagramclone.ui.screen.CreatePostMenu
 import com.rohitneel.instagramclone.ui.screen.FeedScreen
 import com.rohitneel.instagramclone.ui.screen.MyPostScreen
@@ -20,9 +24,11 @@ import com.rohitneel.instagramclone.ui.screen.NotificationsScreen
 import com.rohitneel.instagramclone.ui.screen.SearchScreen
 import com.rohitneel.instagramclone.ui.screen.SearchedPostScreen
 import com.rohitneel.instagramclone.ui.screen.SinglePostScreen
+import com.rohitneel.instagramclone.ui.screen.SplashScreen
 import com.rohitneel.instagramclone.ui.screen.UserFollowerListScreen
 import com.rohitneel.instagramclone.ui.screen.ViewStory
 import com.rohitneel.instagramclone.ui.screen.ViewUserStory
+import com.rohitneel.instagramclone.util.SharedPreferencesHelper
 
 @Composable
 fun AppNavHost(
@@ -30,16 +36,33 @@ fun AppNavHost(
     viewModel: InstagramViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val systemUiController: SystemUiController = rememberSystemUiController()
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = DestinationScreen.Signup.route
+        startDestination = DestinationScreen.Splash.route
     ) {
-        composable(DestinationScreen.Signup.route){
-            SignupScreen(navController = navController, viewModel = viewModel)
+        composable(DestinationScreen.Splash.route){
+            SplashScreen {
+                if (SharedPreferencesHelper.isFirstLaunch(context)) {
+                    systemUiController.isStatusBarVisible = false
+                    navController.navigate(DestinationScreen.Onboarding.route)
+                } else {
+                    navController.navigate(DestinationScreen.Authentication.route)
+                }
+            }
         }
-        composable(DestinationScreen.Login.route) {
-            LoginScreen(navController = navController, viewModel = viewModel)
+        composable(DestinationScreen.Onboarding.route) {
+            Onboarding(navController = navController)
+            SharedPreferencesHelper.setFirstLaunch(context, false)
+        }
+        composable(DestinationScreen.Authentication.route) {
+            systemUiController.isStatusBarVisible = true
+            AuthenticationScreen(navController = navController, viewModel = viewModel)
+        }
+        composable(DestinationScreen.ForgotPassword.route) {
+            ForgotPasswordScreen(navController = navController, viewModel = viewModel)
         }
         composable(DestinationScreen.Feed.route) {
             FeedScreen(navController = navController, viewModel = viewModel)

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -28,9 +29,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,11 +44,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +62,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -63,6 +71,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,13 +81,16 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.google.protobuf.DescriptorProtos.FieldDescriptorProto.Label
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.ui.components.ToggleIconButton
 import com.rohitneel.instagramclone.ui.screen.ShowCommentScreen
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun NotificationMessage(viewModel: InstagramViewModel) {
@@ -89,7 +102,7 @@ fun NotificationMessage(viewModel: InstagramViewModel) {
 }
 
 @Composable
-fun CommonProgressSpinner() {
+fun CommonProgressIndicator() {
     Row(
         modifier = Modifier
             .alpha(0.5f)
@@ -100,6 +113,21 @@ fun CommonProgressSpinner() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun CommonProgressSpinner() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Spinner(
+            modifier = Modifier.size(100.dp),
+            color = Color.Black,
+            sectionLength = 12.dp,
+            sectionWidth = 12.dp
+        )
     }
 }
 
@@ -155,14 +183,13 @@ fun CheckSignedIn(navController: NavController, viewModel: InstagramViewModel) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun CommonImage(
     data: String?,
     modifier: Modifier = Modifier.wrapContentSize(),
     contentScale: ContentScale = ContentScale.Crop
 ) {
-    val painter = rememberImagePainter(data = data)
+    val painter = rememberAsyncImagePainter(model = data)
     Image(
         painter = painter,
         contentDescription = null,
@@ -170,7 +197,7 @@ fun CommonImage(
         contentScale = contentScale
     )
     if (painter.state is AsyncImagePainter.State.Loading) {
-        CommonProgressSpinner()
+        CommonProgressIndicator()
     }
 }
 
@@ -241,16 +268,39 @@ private enum class LikeIconSize {
 
 @Composable
 fun LikeAnimation(like: Boolean = true) {
-    var sizeState by remember { mutableStateOf(LikeIconSize.SMALL) }
-    val transition = updateTransition(targetState = sizeState, label = "")
-    val size by transition.animateDp(
-        label = "",
+    var likeSizeState by remember { mutableStateOf(LikeIconSize.SMALL) }
+    var dislikeSizeState by remember { mutableStateOf(LikeIconSize.SMALL) }
+
+    LaunchedEffect(like) {
+        likeSizeState = if (like) LikeIconSize.LARGE else LikeIconSize.SMALL
+    }
+    LaunchedEffect(!like) {
+        dislikeSizeState = if (!like) LikeIconSize.LARGE else LikeIconSize.SMALL
+    }
+
+    val likeTransition = updateTransition(targetState = likeSizeState, label = "")
+    val likeSize by likeTransition.animateDp(
         transitionSpec = {
             spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessLow
             )
+        }, label = ""
+    ) { state ->
+        when (state) {
+            LikeIconSize.SMALL -> 0.dp
+            LikeIconSize.LARGE -> 150.dp
         }
+    }
+
+    val dislikeTransition = updateTransition(targetState = dislikeSizeState, label = "")
+    val dislikeSize by dislikeTransition.animateDp(
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        }, label = ""
     ) { state ->
         when (state) {
             LikeIconSize.SMALL -> 0.dp
@@ -261,10 +311,9 @@ fun LikeAnimation(like: Boolean = true) {
     Image(
         painter = painterResource(id = if (like) R.drawable.ic_like else R.drawable.ic_dislike),
         contentDescription = null,
-        modifier = Modifier.size(size = size),
+        modifier = if (like) Modifier.size(size = likeSize) else Modifier.size(size = dislikeSize),
         colorFilter = ColorFilter.tint(if (like) Color.Red else Color.Gray)
     )
-    sizeState = LikeIconSize.LARGE
 }
 
 @Composable
@@ -433,9 +482,13 @@ fun ShowMoreOptionsBottomSheet(
                             isLikeCountVisible.value = !isLikeCountVisible.value
                             isBottomSheetOpened.value = false
                             if (isLikeCountVisible.value) {
-                                Toast.makeText(context, "Like count unhidden", Toast.LENGTH_SHORT).show()
+                                Toast
+                                    .makeText(context, "Like count unhidden", Toast.LENGTH_SHORT)
+                                    .show()
                             } else {
-                                Toast.makeText(context, "Like count hidden", Toast.LENGTH_SHORT).show()
+                                Toast
+                                    .makeText(context, "Like count hidden", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         },
                     verticalAlignment = Alignment.CenterVertically,
@@ -616,6 +669,77 @@ fun DeleteCommentDialog(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CustomOutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String = "",
+    leadingIcon: ImageVector,
+    leadingIconDescription: String = "",
+    isPasswordField: Boolean = false,
+    isPasswordVisible: Boolean = false,
+    onVisibilityChange: (Boolean) -> Unit = {},
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    showError: Boolean = false,
+    errorMessage: String = ""
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = { onValueChange(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp, top = 10.dp),
+            label = { Text(label) },
+            leadingIcon = {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = leadingIconDescription,
+                    tint = if (showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                )
+            },
+            isError = showError,
+            trailingIcon = {
+                if (showError && !isPasswordField)
+                    Icon(imageVector = Icons.Filled.Error, contentDescription = "Show error icon")
+                if (isPasswordField) {
+                    IconButton(onClick = { onVisibilityChange(!isPasswordVisible) }) {
+                        Icon(
+                            painter = if (isPasswordVisible) painterResource(id = R.drawable.ic_visibility_24) else painterResource(
+                                id = R.drawable.ic_visibility_off_24
+                            ),
+                            contentDescription = "Toggle password visibility"
+                        )
+                    }
+                }
+            },
+            visualTransformation = when {
+                isPasswordField && isPasswordVisible -> VisualTransformation.None
+                isPasswordField -> PasswordVisualTransformation()
+                else -> VisualTransformation.None
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = true
+        )
+        if (showError) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .offset(y = (-8).dp)
+                    .fillMaxWidth(0.9f)
+            )
         }
     }
 }

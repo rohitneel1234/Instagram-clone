@@ -89,12 +89,13 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
 
         PostList(
             isContextLoading = false,
+            isSearchScreenPost = true,
             postLoading = searchedPostLoading,
             posts = searchedPosts,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(8.dp),
         ) { post ->
             if (userData?.userId == post.userId) {
                 navigateTo(navController = navController, destinationScreen = DestinationScreen.MyPosts)

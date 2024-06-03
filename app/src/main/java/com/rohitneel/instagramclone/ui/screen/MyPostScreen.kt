@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,7 +59,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
-import com.rohitneel.instagramclone.common.CommonProgressSpinner
+import com.rohitneel.instagramclone.common.CommonProgressIndicator
 import com.rohitneel.instagramclone.common.NavParams
 import com.rohitneel.instagramclone.common.UserImageCard
 import com.rohitneel.instagramclone.common.navigateTo
@@ -212,7 +211,7 @@ fun MyPostScreen(navController: NavController, viewModel: InstagramViewModel) {
     }
 
     if (isLoading) {
-        CommonProgressSpinner()
+        CommonProgressIndicator()
     }
 }
 
@@ -246,14 +245,15 @@ fun ProfileImage(imageUrl: String?, onClick: () -> Unit) {
 @Composable
 fun PostList(
     isContextLoading: Boolean,
+    isSearchScreenPost: Boolean = false,
     postLoading: Boolean,
     posts: List<PostData>,
     modifier: Modifier,
     onPostClick: (PostData) -> Unit
 ) {
     if (postLoading) {
-        CommonProgressSpinner()
-    } else if (posts.isEmpty()) {
+        CommonProgressIndicator()
+    } else if (posts.isEmpty() && isSearchScreenPost) {
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Adaptive(125.dp), // Specify number of columns for the grid
         ) {

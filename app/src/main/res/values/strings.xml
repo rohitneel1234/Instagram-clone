@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">InstagramClone</string>
+    <string name="default_web_client_id">530544325328-808n5du2bpcgire1nstibgi0pmqdpbaj.apps.googleusercontent.com</string>
+    <string name="title_1">Discover Inspiring Content</string>
+    <string name="description_1">Explore a creativity and inspiration with a diverse range of photos, and stories from users.</string>
+    <string name="title_2">Share Your Moments</string>
+    <string name="description_2">Capture and share your favorite moments through photos in your unique style with your followers and friends</string>
+    <string name="title_3">Connect and Engage</string>
+    <string name="description_3">Let\'s start building meaningful connections! Follow friends and family to see their latest updates. Interact with posts by liking, commenting, and sharing your thoughts.</string>
 </resources>
