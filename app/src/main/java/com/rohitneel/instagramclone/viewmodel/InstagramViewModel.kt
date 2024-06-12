@@ -241,8 +241,8 @@ class InstagramViewModel @Inject constructor(
         popupNotification.value = Event(message)
     }
 
-    fun updateProfileData(name: String, userName: String, bio: String) {
-        createOrUpdateProfile(name, userName, bio)
+    fun updateProfileData(name: String, userName: String, userEmail: String, bio: String) {
+        createOrUpdateProfile(name, userName, userEmail, bio)
     }
 
     private fun uploadImage(uri: Uri, onSuccess: (Uri) -> Unit) {

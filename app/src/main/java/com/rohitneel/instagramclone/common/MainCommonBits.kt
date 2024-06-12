@@ -123,10 +123,10 @@ fun CommonProgressSpinner() {
         contentAlignment = Alignment.Center
     ) {
         Spinner(
-            modifier = Modifier.size(100.dp),
+            modifier = Modifier.size(75.dp),
             color = Color.Black,
-            sectionLength = 12.dp,
-            sectionWidth = 12.dp
+            sectionLength = 8.dp,
+            sectionWidth = 8.dp
         )
     }
 }

@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -92,14 +91,13 @@ fun SplashScreen(onTimeout: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.ic_launcher_app_logo),
                 modifier = Modifier
                     .size(250.dp)
                     .rotate(rotation.value),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 contentDescription = null
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = stringResource(id = R.string.app_name),
                 style = TextStyle(

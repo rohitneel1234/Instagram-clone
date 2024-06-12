@@ -56,43 +56,43 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
-    implementation 'androidx.activity:activity-compose:1.4.0'
-    implementation platform('androidx.compose:compose-bom:2023.03.00')
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.ui:ui-graphics'
-    implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation 'androidx.compose.material3:material3:1.2.0-beta02'
-    implementation "androidx.navigation:navigation-compose:2.4.0-beta01"
+    implementation "androidx.core:core-ktx:${versions.coreKtx}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${versions.lifecycleRuntimeKtx}"
+    implementation "androidx.activity:activity-compose:${versions.activityCompose}"
+    implementation platform("androidx.compose:compose-bom:${versions.composeBom}")
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.ui:ui-graphics"
+    implementation "androidx.compose.ui:ui-tooling-preview"
+    implementation "androidx.compose.material3:material3:${versions.composeMaterial3}"
+    implementation "androidx.navigation:navigation-compose:${versions.navigationCompose}"
 
-    implementation "com.google.firebase:firebase-auth:19.2.0"
-    implementation platform('com.google.firebase:firebase-bom:29.0.0')
+    implementation "com.google.firebase:firebase-auth:${versions.firebaseAuth}"
+    implementation platform("com.google.firebase:firebase-bom:${versions.firebaseBom}")
     implementation "com.google.firebase:firebase-auth-ktx"
     implementation "com.google.firebase:firebase-firestore-ktx"
     implementation "com.google.firebase:firebase-storage-ktx"
-    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+    implementation "com.google.android.gms:play-services-auth:${versions.playServicesAuth}"
 
-    implementation "com.google.dagger:hilt-android:2.44.2"
-    implementation "androidx.hilt:hilt-navigation-compose:1.0.0-beta01"
-    kapt "com.google.dagger:hilt-android-compiler:2.44.2"
+    implementation "com.google.dagger:hilt-android:${versions.hiltAndroid}"
+    implementation "androidx.hilt:hilt-navigation-compose:${versions.hiltNavigationCompose}"
+    kapt "com.google.dagger:hilt-android-compiler:${versions.hiltAndroid}"
 
-    implementation "io.coil-kt:coil-compose:2.6.0"
+    implementation "io.coil-kt:coil-compose:${versions.coilCompose}"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.3")
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.30.1"
-    implementation "com.google.accompanist:accompanist-pager:0.12.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
-    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.0"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutinesAndroid}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${versions.coroutinesPlayServices}"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:${versions.accompanistUiController}"
+    implementation "com.google.accompanist:accompanist-pager:${versions.accompanistPager}"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serializationJson}"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:${versions.lifecycleRuntimeCompose}"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:${versions.lifecycleViewModelCompose}"
     implementation "androidx.compose.runtime:runtime-livedata"
-    implementation "androidx.compose.material:material-icons-extended:1.6.6"
+    implementation "androidx.compose.material:material-icons-extended:${versions.composeMaterialIconsExtended}"
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation platform('androidx.compose:compose-bom:2023.03.00')
+    testImplementation "junit:junit:${versions.junit}"
+    androidTestImplementation "androidx.test.ext:junit:${versions.androidTestJunit}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${versions.espressoCore}"
+    androidTestImplementation platform("androidx.compose:compose-bom:${versions.composeBom}")
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'

@@ -43,7 +43,7 @@ fun Spinner(
         ),
         label = "angle_animation"
     )
-    Canvas(modifier = modifier) {
+    Canvas(modifier = modifier.size(75.dp)) {
 
         // Step 3. Define rotation radius and angle separation for each section.
         val radius = size.height / 2

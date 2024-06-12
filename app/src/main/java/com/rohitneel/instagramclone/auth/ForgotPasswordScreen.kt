@@ -109,7 +109,7 @@ fun ForgotPasswordScreen(navController: NavController, viewModel: InstagramViewM
                         .padding(horizontal = 20.dp)
                         .padding(top = 20.dp),
                     colors = TextFieldDefaults.colors(
-                        cursorColor = PrimaryColor,
+                        cursorColor = Color.Black,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                     ),
@@ -123,7 +123,6 @@ fun ForgotPasswordScreen(navController: NavController, viewModel: InstagramViewM
                             Icon(
                                 imageVector = Icons.Filled.Email,
                                 contentDescription = "",
-                                tint = PrimaryColor,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
@@ -131,7 +130,7 @@ fun ForgotPasswordScreen(navController: NavController, viewModel: InstagramViewM
                                 modifier = Modifier
                                     .width(1.dp)
                                     .height(24.dp)
-                                    .background(PrimaryColor)
+                                    .background(colorResource(id = R.color.black))
                             )
                         }
                     },
@@ -153,7 +152,7 @@ fun ForgotPasswordScreen(navController: NavController, viewModel: InstagramViewM
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryColor
+                        containerColor = colorResource(id = R.color.button_background_color)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -169,7 +168,6 @@ fun ForgotPasswordScreen(navController: NavController, viewModel: InstagramViewM
                     Text(
                         text = "Send link",
                         fontFamily = FontFamily.Serif,
-                        color = SecondaryColor,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )

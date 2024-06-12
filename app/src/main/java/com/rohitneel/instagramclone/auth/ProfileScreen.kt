@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -75,7 +77,7 @@ fun ProfileScreen(navController: NavController, viewModel: InstagramViewModel) {
             onUserNameChange = { userName = it },
             onEmailChange = { userEmail = it },
             onBioChange = { bio = it },
-            onSave = { viewModel.updateProfileData(name, userName, bio) },
+            onSave = { viewModel.updateProfileData(name, userName, userEmail, bio) },
             onBack = { navigateTo(navController = navController, DestinationScreen.MyPosts) },
             onLogout = {
                 viewModel.onLogout()
@@ -139,6 +141,7 @@ fun ProfileContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(start = 8.dp, end = 8.dp, top = 4.dp)
         ) {
             TextField(

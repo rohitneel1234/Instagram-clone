@@ -264,7 +264,7 @@ fun StoriesSection(storyList: List<Stories>, navController: NavController) {
 }
 
 fun getStories(): List<Stories> = listOf(
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
+    Stories(userName = "instagram", profile = R.drawable.ic_launcher_app_logo),
     Stories(userName = "nature", profile = R.drawable.nature),
     Stories(userName = "avengers", profile = R.drawable.avengers),
     Stories(userName = "flower", profile = R.drawable.flower)
