@@ -4,5 +4,5 @@ import com.rohitneel.instagramclone.R
 
 data class Stories(
     val userName: String = "",
-    val profile: Int = R.drawable.ic_launcher_app_logo
+    val profile: Int = R.mipmap.ic_launcher
 )

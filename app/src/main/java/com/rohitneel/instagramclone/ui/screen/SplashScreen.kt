@@ -93,7 +93,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher_app_logo),
                 modifier = Modifier
-                    .size(250.dp)
+                    .size(150.dp)
                     .rotate(rotation.value),
                 contentDescription = null
             )
