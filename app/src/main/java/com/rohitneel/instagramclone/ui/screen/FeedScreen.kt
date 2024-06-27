@@ -33,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
@@ -60,11 +61,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
+import com.rohitneel.instagramclone.common.CommonProgressIndicator
 import com.rohitneel.instagramclone.common.CommonProgressSpinner
+import com.rohitneel.instagramclone.common.CustomButton
 import com.rohitneel.instagramclone.common.LikeAnimation
 import com.rohitneel.instagramclone.common.ShowMoreOptionsBottomSheet
 import com.rohitneel.instagramclone.common.ShowPostActionIcons
@@ -198,7 +200,6 @@ fun FeedScreen(navController: NavController, viewModel: InstagramViewModel) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun UserStoryImageCard(
     userImage: String?,
@@ -215,7 +216,7 @@ fun UserStoryImageCard(
             )
         } else {
             Image(
-                painter = rememberImagePainter(data = userImage),
+                painter = rememberAsyncImagePainter(model = userImage),
                 contentDescription = null,
                 modifier = Modifier
                     .size(60.dp)
@@ -263,10 +264,10 @@ fun StoriesSection(storyList: List<Stories>, navController: NavController) {
 }
 
 fun getStories(): List<Stories> = listOf(
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
-    Stories(userName = "mountain", profile = R.drawable.mountains_image),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo),
-    Stories(userName = "instagram", profile = R.drawable.ic_instagram_logo)
+    Stories(userName = "instagram", profile = R.mipmap.ic_launcher),
+    Stories(userName = "nature", profile = R.drawable.nature),
+    Stories(userName = "avengers", profile = R.drawable.avengers),
+    Stories(userName = "flower", profile = R.drawable.flower)
 )
 
 @Composable
@@ -294,11 +295,17 @@ fun StoryItem(story: Stories, navController: NavController) {
                 .clickable {
                     val listOfImage = when (story.userName) {
                         "instagram" -> listOf(R.drawable.insta_story_01, R.drawable.insta_story_02)
-                        "mountain" -> listOf(R.drawable.mountains_image)
+                        "nature" -> listOf(R.drawable.nature)
+                        "avengers" -> listOf(R.drawable.avengers)
+                        "flower" -> listOf(R.drawable.flower)
                         else -> emptyList()
                     }
                     val jsonString = Json.encodeToString(listOfImage)
-                    val route = DestinationScreen.ViewStory.createRoute(jsonString, story.userName, story.profile)
+                    val route = DestinationScreen.ViewStory.createRoute(
+                        jsonString,
+                        story.userName,
+                        story.profile
+                    )
                     navController.navigate(route)
                 },
             contentScale = ContentScale.Crop
@@ -365,6 +372,8 @@ fun Post(
     val comments = viewModel.comments.value
     val likeCount = remember { mutableStateOf(post.likes?.size ?: 0) }
     val isFavorite = remember { mutableStateOf(post.isLiked) }
+    val isLikeCountVisible = remember { mutableStateOf(true) }
+    val isCommentOptionVisible = remember { mutableStateOf(true) }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getComments(post.postId)
@@ -374,7 +383,9 @@ fun Post(
         isBottomSheetOpened = isBottomSheetOpened,
         navController = navController,
         viewModel = viewModel,
-        post = post
+        post = post,
+        isLikeCountVisible = isLikeCountVisible,
+        isCommentOptionVisible = isCommentOptionVisible
     )
     Column(
         modifier = Modifier
@@ -402,27 +413,24 @@ fun Post(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(4.dp)
             )
-             if (userData?.following?.contains(post.userId) == true) {
-                Text(
-                    text = "Following",
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .padding(start = 24.dp)
-                        .clickable {
-                            viewModel.onFollowClick(post.userId!!)
-                        })
-            } else if (userData?.userId != post.userId) {
-                Text(
-                    text = "Follow",
-                    color = colorResource(id = R.color.blue),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(start = 24.dp)
-                        .clickable {
-                            viewModel.onFollowClick(post.userId!!)
-                        })
-            }
             Spacer(modifier = Modifier.weight(1f))
+            if (userData?.following?.contains(post.userId) == true) {
+                 CustomButton(
+                     text = "Following",
+                     textColor = MaterialTheme.colorScheme.onBackground,
+                     backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
+                     viewModel = viewModel,
+                     post = post
+                 )
+            } else if (userData?.userId != post.userId) {
+                 CustomButton(
+                     text = "Follow",
+                     textColor = Color.White,
+                     backgroundColor = colorResource(id = R.color.button_background_color),
+                     viewModel = viewModel,
+                     post = post
+                 )
+            }
             IconButton(
                 onClick = {
                     if (userData?.userId == post.userId) {
@@ -464,14 +472,14 @@ fun Post(
             )
 
             if (likeAnimation.value) {
-                CoroutineScope(Dispatchers.Main).launch {
+                LaunchedEffect(Unit) {
                     delay(1000L)
                     likeAnimation.value = false
                 }
                 LikeAnimation(true)
             }
             if (dislikeAnimation.value) {
-                CoroutineScope(Dispatchers.Main).launch {
+                LaunchedEffect(Unit) {
                     delay(1000L)
                     dislikeAnimation.value = false
                 }
@@ -483,7 +491,9 @@ fun Post(
             post = post,
             numberOfComments = comments.size,
             likeCount = likeCount,
-            isFavorite = isFavorite
+            isFavorite = isFavorite,
+            isLikeCountVisible = isLikeCountVisible,
+            isCommentOptionVisible = isCommentOptionVisible
         )
     }
 }

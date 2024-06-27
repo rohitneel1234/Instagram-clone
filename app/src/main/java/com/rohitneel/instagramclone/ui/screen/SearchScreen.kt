@@ -13,6 +13,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,6 +38,14 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
     val searchedPosts = viewModel.searchedPost.value
     var searchTerm by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val userData = viewModel.userData.value
+
+    // Observe search term changes to clear searched posts when searchTerm is empty
+    LaunchedEffect(searchTerm) {
+        if (searchTerm.isEmpty()) {
+            viewModel.clearSearchedPosts()
+        }
+    }
 
     Column {
         SearchBar(
@@ -80,18 +89,23 @@ fun SearchScreen(navController: NavController, viewModel: InstagramViewModel) {
 
         PostList(
             isContextLoading = false,
+            isSearchScreenPost = true,
             postLoading = searchedPostLoading,
             posts = searchedPosts,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(8.dp),
         ) { post ->
-            navigateTo(
-                navController = navController,
-                destinationScreen = DestinationScreen.SearchPost,
-                NavParams("post", post)
-            )
+            if (userData?.userId == post.userId) {
+                navigateTo(navController = navController, destinationScreen = DestinationScreen.MyPosts)
+            } else {
+                navigateTo(
+                    navController = navController,
+                    destinationScreen = DestinationScreen.SearchPost,
+                    NavParams("post", post)
+                )
+            }
         }
     }
 }

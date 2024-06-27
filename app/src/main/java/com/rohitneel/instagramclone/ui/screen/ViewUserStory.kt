@@ -38,16 +38,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.rohitneel.instagramclone.common.StoryPostProgressSpinner
 import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalCoilApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel) {
     val stories = viewModel.stories.value
@@ -56,8 +55,8 @@ fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel) {
     val coroutineScope = rememberCoroutineScope()
     var currentPage by remember { mutableStateOf(0) }
     val userData = viewModel.userData.value
-    val painter = rememberImagePainter(stories?.story)
-    val isImageLoaded = painter.state is ImagePainter.State.Success
+    val painter = rememberAsyncImagePainter(stories?.story)
+    val isImageLoaded = painter.state is AsyncImagePainter.State.Success
 
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(state = pagerState) {
@@ -81,7 +80,7 @@ fun ViewUserStory(navController: NavController, viewModel: InstagramViewModel) {
                     .size(32.dp)
             ) {
                 Image(
-                    painter = rememberImagePainter(data = userData?.imageUrl),
+                    painter = rememberAsyncImagePainter(model = userData?.imageUrl),
                     contentDescription = null,
                     modifier = Modifier.wrapContentSize(),
                     contentScale = ContentScale.Crop

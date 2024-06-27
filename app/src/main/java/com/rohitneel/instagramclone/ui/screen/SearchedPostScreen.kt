@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +40,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonImage
+import com.rohitneel.instagramclone.common.CustomButton
 import com.rohitneel.instagramclone.common.ShowMoreOptionsBottomSheet
 import com.rohitneel.instagramclone.common.ShowPostActionIcons
 import com.rohitneel.instagramclone.models.PostData
@@ -95,6 +96,8 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
     val isBottomSheetOpened = remember { mutableStateOf(false) }
     val likeCount = remember { mutableStateOf(post.likes?.size ?: 0) }
     val isFavorite = remember { mutableStateOf(post.isLiked) }
+    val isLikeCountVisible = remember { mutableStateOf(true) }
+    val isCommentOptionVisible = remember { mutableStateOf(true) }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getComments(post.postId)
@@ -104,7 +107,9 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
         isBottomSheetOpened = isBottomSheetOpened,
         navController = navController,
         viewModel = viewModel,
-        post = post
+        post = post,
+        isLikeCountVisible = isLikeCountVisible,
+        isCommentOptionVisible = isCommentOptionVisible
     )
     Column(
         modifier = Modifier
@@ -133,36 +138,34 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
                    )
                 }
                 Text(text = post.userName ?: "", fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(24.dp))
-
-                if (userData?.userId == post.userId) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(
-                        onClick = {
-                            isBottomSheetOpened.value = true
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = null,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
-                } else if (userData?.following?.contains(post.userId) == true) {
-                    Text(
+                Spacer(modifier = Modifier.weight(1f))
+                if (userData?.following?.contains(post.userId) == true) {
+                    CustomButton(
                         text = "Following",
-                        color = Color.Gray,
-                        modifier = Modifier.clickable {
-                            viewModel.onFollowClick(post.userId!!)
-                        })
+                        textColor = MaterialTheme.colorScheme.onBackground,
+                        backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        viewModel = viewModel,
+                        post = post
+                    )
                 } else {
-                    Text(
+                    CustomButton(
                         text = "Follow",
-                        color = colorResource(id = R.color.blue),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable {
-                            viewModel.onFollowClick(post.userId!!)
-                        })
+                        textColor = Color.White,
+                        backgroundColor = colorResource(id = R.color.button_background_color),
+                        viewModel = viewModel,
+                        post = post
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        isBottomSheetOpened.value = false
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = null,
+                        modifier = Modifier.padding(8.dp)
+                    )
                 }
             }
         }
@@ -181,7 +184,9 @@ fun SearchPostDisplay(navController: NavController, viewModel: InstagramViewMode
             post = post,
             numberOfComments = numberOfComments,
             likeCount = likeCount,
-            isFavorite = isFavorite
+            isFavorite = isFavorite,
+            isLikeCountVisible = isLikeCountVisible,
+            isCommentOptionVisible = isCommentOptionVisible
         )
     }
 }

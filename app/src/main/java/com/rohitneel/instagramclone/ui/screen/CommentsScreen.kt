@@ -49,7 +49,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonDivider
@@ -59,7 +58,7 @@ import com.rohitneel.instagramclone.common.DeleteCommentDialog
 import com.rohitneel.instagramclone.models.CommentData
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalCoilApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowCommentScreen(
     isCommentBottomSheetOpened: MutableState<Boolean>,
@@ -134,7 +133,7 @@ fun ShowCommentScreen(
                     }
                 } else {
                     items(items = comments) {comment ->
-                        CommentRow(comment, userId, postUserId, viewModel)
+                        CommentRow(comment, userId, postUserId, postId, viewModel)
                     }
                 }
             }
@@ -207,6 +206,7 @@ fun CommentRow(
     comment: CommentData,
     userId: String?,
     postUserId: String?,
+    postId: String,
     viewModel: InstagramViewModel
 ) {
     var isCommentSelected by remember { mutableStateOf(false) }
@@ -242,7 +242,7 @@ fun CommentRow(
     if (isCommentSelected) {
         DeleteCommentDialog(
             onConfirm = {
-                comment.commentId?.let { it1 -> viewModel.deleteComment(it1) }
+                comment.commentId?.let { it1 -> viewModel.deleteComment(it1, postId) }
                 isCommentSelected = false
             },
             onCancel = { isCommentSelected = false }

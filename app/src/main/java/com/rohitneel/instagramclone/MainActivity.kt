@@ -16,19 +16,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.size.Scale
 import coil.transform.CircleCropTransformation
 import com.rohitneel.instagramclone.common.NotificationMessage
@@ -58,32 +60,33 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun InstagramApp() {
     val viewModel = hiltViewModel<InstagramViewModel>()
     val navController = rememberNavController()
     var showBottomBar by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
+    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     val userData = viewModel.userData.value
     val profileIconPainter = userData?.imageUrl?.let {
-        rememberImagePainter(
-            data = it,
-            builder = {
+        // You can apply transformations or other settings here
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = it).apply(block = fun ImageRequest.Builder.() {
                 // You can apply transformations or other settings here
                 transformations(CircleCropTransformation())
                 scale(Scale.FIT)
                 size(100)
-            }
+            }).build()
         )
     } ?: painterResource(id = R.drawable.ic_profile_icon)
 
     NotificationMessage(viewModel = viewModel)
 
     showBottomBar = when (navBackStackEntry?.destination?.route) {
-        DestinationScreen.Signup.route -> false // on this screen bottom bar should be hidden
-        DestinationScreen.Login.route -> false // here too
+        DestinationScreen.Splash.route -> false // on this screen bottom bar should be hidden
+        DestinationScreen.Onboarding.route -> false // here too
+        DestinationScreen.Authentication.route -> false // here too
+        DestinationScreen.ForgotPassword.route -> false // here too
         DestinationScreen.Profile.route -> false // here too
         DestinationScreen.NewPost.route -> false // here too
         DestinationScreen.ViewStory.route -> false // here too

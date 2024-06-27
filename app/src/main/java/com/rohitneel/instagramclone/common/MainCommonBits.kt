@@ -13,22 +13,29 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,11 +44,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,8 +59,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -60,6 +71,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,14 +80,17 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.google.protobuf.DescriptorProtos.FieldDescriptorProto.Label
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.ui.components.ToggleIconButton
 import com.rohitneel.instagramclone.ui.screen.ShowCommentScreen
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun NotificationMessage(viewModel: InstagramViewModel) {
@@ -86,7 +102,7 @@ fun NotificationMessage(viewModel: InstagramViewModel) {
 }
 
 @Composable
-fun CommonProgressSpinner() {
+fun CommonProgressIndicator() {
     Row(
         modifier = Modifier
             .alpha(0.5f)
@@ -97,6 +113,21 @@ fun CommonProgressSpinner() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun CommonProgressSpinner() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Spinner(
+            modifier = Modifier.size(75.dp),
+            color = Color.Black,
+            sectionLength = 8.dp,
+            sectionWidth = 8.dp
+        )
     }
 }
 
@@ -152,22 +183,21 @@ fun CheckSignedIn(navController: NavController, viewModel: InstagramViewModel) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun CommonImage(
     data: String?,
     modifier: Modifier = Modifier.wrapContentSize(),
     contentScale: ContentScale = ContentScale.Crop
 ) {
-    val painter = rememberImagePainter(data = data)
+    val painter = rememberAsyncImagePainter(model = data)
     Image(
         painter = painter,
         contentDescription = null,
         modifier = modifier,
         contentScale = contentScale
     )
-    if (painter.state is ImagePainter.State.Loading) {
-        CommonProgressSpinner()
+    if (painter.state is AsyncImagePainter.State.Loading) {
+        CommonProgressIndicator()
     }
 }
 
@@ -203,6 +233,34 @@ fun CommonDivider() {
     )
 }
 
+@Composable
+fun CustomButton(
+    text: String,
+    textColor: Color,
+    backgroundColor: Color,
+    viewModel: InstagramViewModel,
+    post: PostData
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(backgroundColor)
+            .padding(vertical = 4.dp, horizontal = 12.dp)
+            .sizeIn(minWidth = 60.dp, minHeight = 20.dp)
+            .clickable {
+                viewModel.onFollowClick(post.userId!!)
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            fontSize = 13.sp,
+            color = textColor
+        )
+    }
+}
+
 private enum class LikeIconSize {
     SMALL,
     LARGE
@@ -210,16 +268,39 @@ private enum class LikeIconSize {
 
 @Composable
 fun LikeAnimation(like: Boolean = true) {
-    var sizeState by remember { mutableStateOf(LikeIconSize.SMALL) }
-    val transition = updateTransition(targetState = sizeState, label = "")
-    val size by transition.animateDp(
-        label = "",
+    var likeSizeState by remember { mutableStateOf(LikeIconSize.SMALL) }
+    var dislikeSizeState by remember { mutableStateOf(LikeIconSize.SMALL) }
+
+    LaunchedEffect(like) {
+        likeSizeState = if (like) LikeIconSize.LARGE else LikeIconSize.SMALL
+    }
+    LaunchedEffect(!like) {
+        dislikeSizeState = if (!like) LikeIconSize.LARGE else LikeIconSize.SMALL
+    }
+
+    val likeTransition = updateTransition(targetState = likeSizeState, label = "")
+    val likeSize by likeTransition.animateDp(
         transitionSpec = {
             spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessLow
             )
+        }, label = ""
+    ) { state ->
+        when (state) {
+            LikeIconSize.SMALL -> 0.dp
+            LikeIconSize.LARGE -> 150.dp
         }
+    }
+
+    val dislikeTransition = updateTransition(targetState = dislikeSizeState, label = "")
+    val dislikeSize by dislikeTransition.animateDp(
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        }, label = ""
     ) { state ->
         when (state) {
             LikeIconSize.SMALL -> 0.dp
@@ -230,10 +311,9 @@ fun LikeAnimation(like: Boolean = true) {
     Image(
         painter = painterResource(id = if (like) R.drawable.ic_like else R.drawable.ic_dislike),
         contentDescription = null,
-        modifier = Modifier.size(size = size),
+        modifier = if (like) Modifier.size(size = likeSize) else Modifier.size(size = dislikeSize),
         colorFilter = ColorFilter.tint(if (like) Color.Red else Color.Gray)
     )
-    sizeState = LikeIconSize.LARGE
 }
 
 @Composable
@@ -242,7 +322,9 @@ fun ShowPostActionIcons(
     post: PostData,
     numberOfComments: Int,
     likeCount: MutableState<Int>,
-    isFavorite: MutableState<Boolean>
+    isFavorite: MutableState<Boolean>,
+    isLikeCountVisible: MutableState<Boolean>,
+    isCommentOptionVisible: MutableState<Boolean>
 ) {
     val isCommentBottomSheetOpened = remember { mutableStateOf(false) }
     var likeCountValue by remember { likeCount }
@@ -265,19 +347,21 @@ fun ShowPostActionIcons(
             viewModel.onLikePost(post, isFavorite.value)
             likeCountValue += if (isFavorite.value) 1 else -1
         }
-        IconButton(
-            onClick = {
-                post.postId?.let {
-                    isCommentBottomSheetOpened.value = true
+        if (isCommentOptionVisible.value) {
+            IconButton(
+                onClick = {
+                    post.postId?.let {
+                        isCommentBottomSheetOpened.value = true
+                    }
                 }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_comment),
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_comment),
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
         }
         IconButton(
             onClick = {
@@ -309,11 +393,13 @@ fun ShowPostActionIcons(
             isBookmarked = !isBookmarked
         }
     }
-    Text(
-        text = if (likeCountValue == -1) "0 likes" else "$likeCountValue likes",
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 16.dp)
-    )
+    if (isLikeCountVisible.value) {
+        Text(
+            text = if (likeCountValue == -1) "0 likes" else "$likeCountValue likes",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+    }
 
     Row(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp)) {
         Text(text = post.userName ?: "", fontWeight = FontWeight.Bold)
@@ -322,7 +408,7 @@ fun ShowPostActionIcons(
 
     Row {
         Text(
-            text = "View $numberOfComments comments",
+            text = if (isCommentOptionVisible.value) "View $numberOfComments comments" else "Comments are off.",
             color = Color.DarkGray,
             fontSize = 14.sp,
             modifier = Modifier
@@ -334,7 +420,7 @@ fun ShowPostActionIcons(
                 }
         )
     }
-    if (isCommentBottomSheetOpened.value) {
+    if (isCommentBottomSheetOpened.value && isCommentOptionVisible.value) {
         post.postId?.let {
             ShowCommentScreen(
                 isCommentBottomSheetOpened = isCommentBottomSheetOpened,
@@ -352,10 +438,13 @@ fun ShowMoreOptionsBottomSheet(
     isBottomSheetOpened: MutableState<Boolean>,
     navController: NavController,
     viewModel: InstagramViewModel,
-    post: PostData
+    post: PostData,
+    isLikeCountVisible: MutableState<Boolean>,
+    isCommentOptionVisible: MutableState<Boolean>
 ) {
     val bottomSheet = rememberModalBottomSheetState()
     var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (isBottomSheetOpened.value) {
         ModalBottomSheet(
@@ -389,17 +478,29 @@ fun ShowMoreOptionsBottomSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { },
+                        .clickable {
+                            isLikeCountVisible.value = !isLikeCountVisible.value
+                            isBottomSheetOpened.value = false
+                            if (isLikeCountVisible.value) {
+                                Toast
+                                    .makeText(context, "Like count unhidden", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast
+                                    .makeText(context, "Like count hidden", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_like_disabled),
+                        painter = painterResource(id = if (isLikeCountVisible.value) R.drawable.ic_like_disabled else R.drawable.ic_dislike),
                         contentDescription = null,
                         tint = Color.Black
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Hide like count",
+                        text = if (isLikeCountVisible.value) "Hide like count" else "Unhide like count",
                         style = TextStyle(
                             fontFamily = FontFamily.Serif,
                             color = Color.Black,
@@ -412,17 +513,20 @@ fun ShowMoreOptionsBottomSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { },
+                        .clickable {
+                            isCommentOptionVisible.value = !isCommentOptionVisible.value
+                            isBottomSheetOpened.value = false
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_comment_disabled),
+                        painter = painterResource(id = if (isCommentOptionVisible.value) R.drawable.ic_comment_disabled else R.drawable.ic_comment),
                         contentDescription = null,
                         tint = Color.Black
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Turn off commenting",
+                        text = if (isCommentOptionVisible.value) "Turn off commenting" else "Turn on commenting",
                         style = TextStyle(
                             fontFamily = FontFamily.Serif,
                             color = Color.Black,
@@ -565,6 +669,77 @@ fun DeleteCommentDialog(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CustomOutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String = "",
+    leadingIcon: ImageVector,
+    leadingIconDescription: String = "",
+    isPasswordField: Boolean = false,
+    isPasswordVisible: Boolean = false,
+    onVisibilityChange: (Boolean) -> Unit = {},
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    showError: Boolean = false,
+    errorMessage: String = ""
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = { onValueChange(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp, top = 10.dp),
+            label = { Text(label) },
+            leadingIcon = {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = leadingIconDescription,
+                    tint = if (showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                )
+            },
+            isError = showError,
+            trailingIcon = {
+                if (showError && !isPasswordField)
+                    Icon(imageVector = Icons.Filled.Error, contentDescription = "Show error icon")
+                if (isPasswordField) {
+                    IconButton(onClick = { onVisibilityChange(!isPasswordVisible) }) {
+                        Icon(
+                            painter = if (isPasswordVisible) painterResource(id = R.drawable.ic_visibility_24) else painterResource(
+                                id = R.drawable.ic_visibility_off_24
+                            ),
+                            contentDescription = "Toggle password visibility"
+                        )
+                    }
+                }
+            },
+            visualTransformation = when {
+                isPasswordField && isPasswordVisible -> VisualTransformation.None
+                isPasswordField -> PasswordVisualTransformation()
+                else -> VisualTransformation.None
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = true
+        )
+        if (showError) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .offset(y = (-8).dp)
+                    .fillMaxWidth(0.9f)
+            )
         }
     }
 }

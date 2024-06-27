@@ -2,9 +2,13 @@ package com.rohitneel.instagramclone.navigation
 
 sealed class DestinationScreen(val route:String){
 
-    object Signup: DestinationScreen("signup")
+    object Splash: DestinationScreen("splash")
 
-    object Login: DestinationScreen("login")
+    object Onboarding: DestinationScreen("onboarding")
+
+    object Authentication: DestinationScreen("authentication")
+
+    object ForgotPassword: DestinationScreen("forgotpassword")
 
     object Feed: DestinationScreen("feed")
 

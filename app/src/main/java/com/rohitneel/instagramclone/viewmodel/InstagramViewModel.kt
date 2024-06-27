@@ -1,10 +1,13 @@
 package com.rohitneel.instagramclone.viewmodel
 
+import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -18,11 +21,18 @@ import com.rohitneel.instagramclone.core.Constants.Companion.TIME_IN_MINUTE
 import com.rohitneel.instagramclone.core.Constants.Companion.USERS_COLLECTION
 import com.rohitneel.instagramclone.models.CommentData
 import com.rohitneel.instagramclone.models.Event
-import com.rohitneel.instagramclone.models.UserFollowConnections
+import com.rohitneel.instagramclone.models.LoginResult
+import com.rohitneel.instagramclone.models.LoginState
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.models.UserData
+import com.rohitneel.instagramclone.models.UserFollowConnections
 import com.rohitneel.instagramclone.models.UserStoryInfo
+import com.rohitneel.instagramclone.util.SharedPreferencesHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import javax.inject.Inject
 
@@ -56,6 +66,9 @@ class InstagramViewModel @Inject constructor(
     val followerListItem = mutableStateOf<List<UserFollowConnections>>(emptyList())
     val followingListItem = mutableStateOf<List<UserFollowConnections>>(emptyList())
 
+    private val _state = MutableStateFlow(LoginState())
+    val state = _state.asStateFlow()
+
     init {
         val currentUser = auth.currentUser
         signedIn.value = currentUser != null
@@ -66,10 +79,6 @@ class InstagramViewModel @Inject constructor(
     }
 
     fun onSignup(userName: String, email: String, password: String) {
-        if (userName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            handleException(customMessage = "Please fill in all fields")
-            return
-        }
         inProgress.value = true
         database.collection(USERS_COLLECTION).whereEqualTo("userName", userName).get()
             .addOnSuccessListener { documents ->
@@ -81,7 +90,7 @@ class InstagramViewModel @Inject constructor(
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 signedIn.value = true
-                                createOrUpdateProfile(userName = userName)
+                                createOrUpdateProfile(userName = userName, userEmail = email)
                             } else {
                                 handleException(task.exception, "Signup Failed")
                             }
@@ -93,10 +102,6 @@ class InstagramViewModel @Inject constructor(
     }
 
     fun onLogin(email: String, password: String) {
-        if (email.isEmpty() || password.isEmpty()) {
-            handleException(customMessage = "Please fill in all fields")
-            return
-        }
         inProgress.value = true
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -116,9 +121,60 @@ class InstagramViewModel @Inject constructor(
             }
     }
 
+    suspend fun checkUserExists(userId: String): Boolean {
+        return try {
+            val document = FirebaseFirestore.getInstance()
+                .collection(USERS_COLLECTION)
+                .whereEqualTo("userEmail", userId)
+                .get()
+                .await()
+            document.size() > 0
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun resetPassword(userEmail: String, onSuccess: () -> Unit) {
+        FirebaseAuth.getInstance().sendPasswordResetEmail(userEmail)
+            .addOnSuccessListener {
+                popupNotification.value = Event("Please check your email")
+                onSuccess.invoke()
+            }
+    }
+
+    fun onSignInResult(result: LoginResult, context: Context) {
+        if (result.data != null) {
+            signedIn.value = true
+            auth.currentUser?.uid?.let { userId ->
+                getUserData(userId) // Fetch user data after successful Google sign-in
+                val credentials: Pair<String, String>? = SharedPreferencesHelper.getCredentials(context)
+                credentials?.let { linkAccount(it.first, it.second) }
+            }
+        } else {
+            handleException(Exception("Sign-in failed"), "Google Sign-in failed")
+        }
+    }
+
+    fun resetState() {
+        _state.update { LoginState() }
+    }
+
+    private fun linkAccount(email: String, password: String) {
+        val credential = EmailAuthProvider.getCredential(email, password)
+        auth.currentUser!!.linkWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("linkAccount", "successfully linked account")
+                } else {
+                    Log.w("linkAccount", "failed to link account: ", task.exception)
+                }
+            }
+    }
+
     private fun createOrUpdateProfile(
         name: String? = null,
         userName: String? = null,
+        userEmail: String? = null,
         bio: String? = null,
         imageUrl: String? = null
     ) {
@@ -127,6 +183,7 @@ class InstagramViewModel @Inject constructor(
             userId = userId,
             name = name ?: userData.value?.name,
             userName = userName ?: userData.value?.userName,
+            userEmail = userEmail ?: userData.value?.userEmail,
             bio = bio ?: userData.value?.bio,
             imageUrl = imageUrl ?: userData.value?.imageUrl,
             following = userData.value?.following
@@ -184,8 +241,8 @@ class InstagramViewModel @Inject constructor(
         popupNotification.value = Event(message)
     }
 
-    fun updateProfileData(name: String, userName: String, bio: String) {
-        createOrUpdateProfile(name, userName, bio)
+    fun updateProfileData(name: String, userName: String, userEmail: String, bio: String) {
+        createOrUpdateProfile(name, userName, userEmail, bio)
     }
 
     private fun uploadImage(uri: Uri, onSuccess: (Uri) -> Unit) {
@@ -426,6 +483,10 @@ class InstagramViewModel @Inject constructor(
         }
     }
 
+    fun clearSearchedPosts() {
+        searchedPost.value = emptyList()
+    }
+
     fun onFollowClick(userId: String) {
         auth.currentUser?.uid?.let { currentUser ->
             val following = arrayListOf<String>()
@@ -589,12 +650,13 @@ class InstagramViewModel @Inject constructor(
             }
     }
 
-    fun deleteComment(commentId: String) {
+    fun deleteComment(commentId: String, postId: String) {
         val fireStore = FirebaseFirestore.getInstance()
         val postsCollection = fireStore.collection(COMMENTS_COLLECTION)
         postsCollection.document(commentId).delete()
             .addOnSuccessListener {
                 popupNotification.value = Event("Comment deleted")
+                getComments(postId)
             }
             .addOnFailureListener { exception ->
                 handleException(exception, "Unable to delete comment")

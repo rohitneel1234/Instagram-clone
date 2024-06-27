@@ -12,7 +12,20 @@
           "package_name": "com.rohitneel.instagramclone"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "530544325328-crljf5j5g7094102kaklpsavi7e9ot2e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rohitneel.instagramclone",
+            "certificate_hash": "e4514effc5805e0bf6b8455c9297aad490672793"
+          }
+        },
+        {
+          "client_id": "530544325328-808n5du2bpcgire1nstibgi0pmqdpbaj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCKZtGWx9g_2S3oBhBNH27XvOmaooY06H8"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "530544325328-808n5du2bpcgire1nstibgi0pmqdpbaj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

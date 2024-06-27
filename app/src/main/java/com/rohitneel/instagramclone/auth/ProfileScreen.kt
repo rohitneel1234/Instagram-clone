@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -48,7 +50,7 @@ import androidx.navigation.NavController
 import com.rohitneel.instagramclone.R
 import com.rohitneel.instagramclone.common.CommonDivider
 import com.rohitneel.instagramclone.common.CommonImage
-import com.rohitneel.instagramclone.common.CommonProgressSpinner
+import com.rohitneel.instagramclone.common.CommonProgressIndicator
 import com.rohitneel.instagramclone.common.navigateTo
 import com.rohitneel.instagramclone.navigation.DestinationScreen
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
@@ -57,26 +59,29 @@ import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 fun ProfileScreen(navController: NavController, viewModel: InstagramViewModel) {
     val isLoading = viewModel.inProgress.value
     if (isLoading) {
-        CommonProgressSpinner()
+        CommonProgressIndicator()
     } else {
         val userData = viewModel.userData.value
         var name by rememberSaveable { mutableStateOf(userData?.name ?: "") }
         var userName by rememberSaveable { mutableStateOf(userData?.userName ?: "") }
+        var userEmail by rememberSaveable { mutableStateOf(userData?.userEmail ?: "") }
         var bio by rememberSaveable { mutableStateOf(userData?.bio ?: "") }
 
         ProfileContent(
             viewModel = viewModel,
             name = name,
             userName = userName,
+            userEmail = userEmail,
             bio = bio,
             onNameChange = { name = it },
             onUserNameChange = { userName = it },
+            onEmailChange = { userEmail = it },
             onBioChange = { bio = it },
-            onSave = { viewModel.updateProfileData(name, userName, bio) },
+            onSave = { viewModel.updateProfileData(name, userName, userEmail, bio) },
             onBack = { navigateTo(navController = navController, DestinationScreen.MyPosts) },
             onLogout = {
                 viewModel.onLogout()
-                navigateTo(navController = navController, DestinationScreen.Login)
+                navigateTo(navController = navController, DestinationScreen.Authentication)
             }
         )
     }
@@ -88,9 +93,11 @@ fun ProfileContent(
     viewModel: InstagramViewModel,
     name: String,
     userName: String,
+    userEmail: String,
     bio: String,
     onNameChange: (String) -> Unit,
     onUserNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
     onBioChange: (String) -> Unit,
     onSave: () -> Unit,
     onBack: () -> Unit,
@@ -134,6 +141,7 @@ fun ProfileContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(start = 8.dp, end = 8.dp, top = 4.dp)
         ) {
             TextField(
@@ -151,6 +159,17 @@ fun ProfileContent(
                 value = userName,
                 onValueChange = onUserNameChange,
                 label = { Text(text = "Username") },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    focusedTextColor = Color.Black,
+                    unfocusedContainerColor = Color.White
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+            TextField(
+                value = userEmail,
+                onValueChange = onEmailChange,
+                label = { Text(text = "Email") },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     focusedTextColor = Color.Black,
@@ -229,7 +248,7 @@ fun ProfileImage(imageUrl: String?, viewModel: InstagramViewModel) {
         }
         val isLoading = viewModel.inProgress.value
         if (isLoading) {
-            CommonProgressSpinner()
+            CommonProgressIndicator()
         }
     }
 }

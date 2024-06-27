@@ -36,7 +36,7 @@ import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.rohitneel.instagramclone.common.CommonImage
-import com.rohitneel.instagramclone.common.CommonProgressSpinner
+import com.rohitneel.instagramclone.common.CommonProgressIndicator
 import com.rohitneel.instagramclone.models.PostData
 import com.rohitneel.instagramclone.viewmodel.InstagramViewModel
 
@@ -82,7 +82,7 @@ fun NotificationsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                CommonProgressSpinner()
+                CommonProgressIndicator()
             }
         }
 
