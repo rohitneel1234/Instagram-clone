@@ -1,0 +1,70 @@
+[versions]
+    gradle-plugin-version = "8.1.0"
+    kotlin-version = "1.8.10"
+    google-service-version = "4.4.0"
+    hilt-version = "2.44.2"
+    core-ktx-version = "1.9.0"
+    lifecycle-runtime = "2.6.2"
+    activity-compose = "1.4.0"
+    compose-bom = "2023.03.00"
+    compose-material3 = "1.2.0-beta02"
+    navigation-compose = "2.4.0-beta01"
+    firebase-auth-version  = "19.2.0"
+    firebase-bom-version   = "29.0.0"
+    playservices-auth           = "20.2.0"
+    hilt-navigation-compose      = "1.0.0-beta01"
+    coil-compose                = "2.6.0"
+    coroutines-android          = "1.3.9"
+    coroutines-playservices     = "1.6.3"
+    accompanist-ui-controller    = "0.30.1"
+    accompanist-pager           = "0.12.0"
+    serialization-json          = "1.3.2"
+    lifecycle-runtime-compose    = "2.6.0"
+    lifecycle-viewmodel-compose  = "2.6.0"
+    compose-runtime-livedata     = "1.6.6"
+    compose-material-icons-extended = "1.6.6"
+    junit                      = "4.13.2"
+    android-test-junit           = "1.1.5"
+    espresso-core               = "3.5.1"
+
+[libraries]
+    androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx-version" }
+    androidx-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime" }
+    androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+    androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+    androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+    androidx-compose-graphics = { module = "androidx.compose.ui:ui-graphics" }
+    androidx-compose-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+    androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
+    androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
+    firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebase-auth-version" }
+    firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom-version" }
+    firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
+    firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+    firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx" }
+    play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playservices-auth" }
+    hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-version" }
+    hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt-version" }
+    hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+    coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
+    kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines-android" }
+    kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines-playservices" }
+    accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-ui-controller" }
+    accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist-pager" }
+    kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization-json" }
+    lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-runtime-compose" }
+    lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-viewmodel-compose" }
+    runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose-runtime-livedata" }
+    material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose-material-icons-extended" }
+    junit = { group = "junit", name = "junit", version.ref = "junit" }
+    androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "android-test-junit" }
+    androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+    androidx-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+    androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+    androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+
+[plugins]
+    android-application = { id = "com.android.application", version.ref = "gradle-plugin-version" }
+    kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-version" }
+    google-services = { id = "com.google.gms.google-services", version.ref = "google-service-version" }
+    hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt-version" }
